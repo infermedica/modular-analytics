@@ -16,5 +16,10 @@
   "keywords": [
     "vue",
     "analytics"
-  ]
+  ],
+  "eslintConfig": {
+    "ignorePatterns": [
+      "**/src/*.js"
+    ]
+  }
 }
