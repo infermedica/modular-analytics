@@ -3,15 +3,17 @@ import analyticModules from './modules';
 const globalProperties = {};
 
 export const Analytics = {
-  trackView(viewName, properties) {
+  trackView(viewName, properties, modules ) {
     analyticModules.forEach((analyticModule) => {
+      if(modules && !modules.includes(analyticModule.name)) return;
       analyticModule.trackView && analyticModule.trackView(
         viewName, Object.assign({}, globalProperties, properties)
       );
     });
   },
-  trackEvent(eventName, properties) {
+  trackEvent(eventName, properties, modules ) {
     analyticModules.forEach((analyticModule) => {
+      if(modules && !modules.includes(analyticModule.name)) return;
       analyticModule.trackEvent && analyticModule.trackEvent(
         eventName, Object.assign({}, globalProperties, properties)
       );
