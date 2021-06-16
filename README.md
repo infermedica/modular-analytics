@@ -82,6 +82,13 @@ Analytics.trackEvent('Event name', {
 });
 ```
 
+You can use the event for all modules or decide with modules should be used for this event, e.g.:
+
+```javascript
+Analytics.trackEvent('Event name', {
+  user_rating: 5
+}, ['amlitude', 'googleTagManager'])
+```
 ### Conversion tracking
 
 To track events, use:
@@ -146,6 +153,7 @@ Currently the following providers are supported:
 * Google Analytics
 * Google Tag Manager (Analytics & AdWords)
 * Amplitude
+* Infermedica Analytic
 
 Other analytics tools are easy to integrate with this module and we might add their support in the future.
 
