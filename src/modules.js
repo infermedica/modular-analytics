@@ -7,11 +7,12 @@ const analyticModules = [];
 
 
 // --- Debug module ---
-if (__analytics.debug.isEnabled) {
+if (__analytics.debug?.isEnabled) {
   const debugModule = function () {
     console.log('Analytics (initialization)');
 
     return {
+      name: 'debug',
       trackView(viewName) {
         console.log('Analytics (trackView):', viewName);
       },
@@ -26,7 +27,7 @@ if (__analytics.debug.isEnabled) {
 
 
 // --- Google Tag Manager ---
-if (__analytics.googleTagManager.isEnabled) {
+if (__analytics.googleTagManager?.isEnabled) {
   const googleAnalyticsModule = function () {
     /* eslint-disable */
     // @formatter:off
@@ -52,6 +53,7 @@ if (__analytics.googleTagManager.isEnabled) {
     }
 
     return {
+      name: 'googleTagManager',
       trackView(viewName) {
         window.gtag('event', 'page_view');
       },
@@ -75,7 +77,7 @@ if (__analytics.googleTagManager.isEnabled) {
 
 
 // --- Google Analytics ---
-else if (__analytics.googleAnalytics.isEnabled) {
+else if (__analytics.googleAnalytics?.isEnabled) {
   const googleAnalyticsModule = function () {
     /* eslint-disable */
     // @formatter:off
@@ -90,6 +92,7 @@ else if (__analytics.googleAnalytics.isEnabled) {
     window.ga('set', 'anonymizeIp', true);
 
     return {
+      name: 'googleAnalytics',
       trackView(viewName) {
         window.ga('send', 'pageview', viewName || window.location.pathname);
       },
@@ -107,7 +110,7 @@ else if (__analytics.googleAnalytics.isEnabled) {
 
 
 // --- Amplitude ---
-if (__analytics.amplitude.isEnabled) {
+if (__analytics.amplitude?.isEnabled) {
   const amplitudeModule = function () {
     /* eslint-disable */
     // @formatter:off
@@ -141,6 +144,7 @@ if (__analytics.amplitude.isEnabled) {
     });
 
     return {
+      name: 'amplitude',
       trackView(viewName) {
         window.amplitude.getInstance().logEvent('Page Viewed', {page: viewName});
       },
@@ -159,5 +163,17 @@ if (__analytics.amplitude.isEnabled) {
   analyticModules.push(amplitudeModule());
 }
 
+// --- Infermedica Analytics ---
+if(__analytics.infermedicaAnalytics?.isEnabled) {
+  const infermedicaModule = function () {
+    return {
+      name: 'infermedicaAnalytics',
+      trackView(viewName) {},
+      trackEvent(eventName, properties) {}
+    }
+  }
+
+  analyticModules.push(infermedicaModule());
+}
 
 export default analyticModules;
