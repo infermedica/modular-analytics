@@ -166,10 +166,23 @@ if (__analytics.amplitude?.isEnabled) {
 // --- Infermedica Analytics ---
 if(__analytics.infermedicaAnalytics?.isEnabled) {
   const infermedicaModule = function () {
+    const Bowser = require('bowser');
+    const browser = Bowser.getParser(window.navigator.userAgent);
+
     return {
       name: 'infermedicaAnalytics',
       trackView(viewName) {},
-      trackEvent(eventName, properties) {}
+      trackEvent(eventName, properties) {
+        const commonProperties = {
+          date: new Date(),
+          browser: browser.getBrowser(),
+          os: browser.getOS(),
+          platform: browser.getPlatform(),
+          user_id: '2j3k4mdk34k' // todo: add anonymous Firebase accounts
+        }
+
+        console.info('[Infermedica Analytics info]: ', Object.assign({}, commonProperties, properties));
+      }
     }
   }
 
