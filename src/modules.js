@@ -1,3 +1,4 @@
+import axios from "axios";
 import Bowser from "bowser";
 import firebase from "firebase/app";
 import 'firebase/auth';
@@ -169,27 +170,37 @@ if (__analytics.amplitude?.isEnabled) {
 // --- Infermedica Analytics ---
 if(__analytics.infermedicaAnalytics?.isEnabled) {
   const infermedicaModule = function () {
-    let uid = "";
-    const firebaseConfig = {
-      apiKey: __analytics.infermedicaAnalytics?.firebaseApiKey,
-      authDomain: __analytics.infermedicaAnalytics?.firebaseAuthDomain,
-      appId: __analytics.infermedicaAnalytics?.firebaseAppId,
+    // __analytics.infermedicaAnalytics?.topic
+    // __analytics.infermedicaAnalytics?.url
+    const publishEvent = function(properties) {
+      axios.post('', properties);
+    }
+    const browser = Bowser.getParser(window.navigator.userAgent);
+    const staticProperties = {
+      browser: browser.getBrowser(),
+      os: browser.getOS(),
+      platform: browser.getPlatform(),
     };
-    firebase.initializeApp(firebaseConfig);
+    const firebaseData = {};
+    const stack = [];
+    firebase.initializeApp(__analytics.infermedicaAnalytics?.firebaseConfig);
     (async function () {
-      try{
+      try {
         await firebase.auth().signInAnonymously();
       }
-      catch (err){
+      catch (err) {
         console.error(err);
       }
     })();
-    firebase.auth().onAuthStateChanged((user)=>{
+    firebase.auth().onAuthStateChanged(async (user)=>{
       if(!user) return;
-      uid = user.uid;
+      firebaseData.uid = user.uid;
+      firebaseData.token = await user.getIdToken();
+      axios.defaults.headers.Authorization = `Bearer ${firebaseData.token}`;
+      stack.forEach(({staticProperties, commonProperties, properties}) => {
+        publishEvent(Object.assign({}, staticProperties, commonProperties, properties, {uid: firebaseData.uid}))
+      })
     })
-
-    const browser = Bowser.getParser(window.navigator.userAgent);
 
     return {
       name: 'infermedicaAnalytics',
@@ -197,13 +208,15 @@ if(__analytics.infermedicaAnalytics?.isEnabled) {
       trackEvent(eventName, properties) {
         const commonProperties = {
           date: new Date(),
-          browser: browser.getBrowser(),
-          os: browser.getOS(),
-          platform: browser.getPlatform(),
-          uid,
+          uid: firebaseData?.uid,
+          environment: __analytics.infermedicaAnalytics?.environment
+        }
+        if(!commonProperties?.uid) {
+          stack.push({staticProperties, commonProperties, properties});
+          return;
         }
 
-        console.info('[Infermedica Analytics info]: ', Object.assign({}, commonProperties, properties));
+        publishEvent(Object.assign({}, staticProperties, commonProperties, properties));
       }
     }
   }
