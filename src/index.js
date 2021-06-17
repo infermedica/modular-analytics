@@ -3,7 +3,8 @@ import analyticModules from './modules';
 const globalProperties = {};
 
 export const Analytics = {
-  trackView(viewName, properties, modules ) {
+  trackView(viewName, properties, modules, disabled = false ) {
+    if(disabled) return;
     analyticModules.forEach((analyticModule) => {
       if(modules && !modules.includes(analyticModule.name)) return;
       analyticModule.trackView && analyticModule.trackView(
@@ -11,7 +12,8 @@ export const Analytics = {
       );
     });
   },
-  trackEvent(eventName, properties, modules ) {
+  trackEvent(eventName, properties, modules, disabled = false ) {
+    if(disabled) return;
     analyticModules.forEach((analyticModule) => {
       if(modules && !modules.includes(analyticModule.name)) return;
       analyticModule.trackEvent && analyticModule.trackEvent(
