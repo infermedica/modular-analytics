@@ -172,8 +172,20 @@ if(__analytics.infermedicaAnalytics?.isEnabled) {
   const infermedicaModule = function () {
     // __analytics.infermedicaAnalytics?.topic
     // __analytics.infermedicaAnalytics?.url
+    const getSupportedProperties = function (properties) {
+      const hasSupportedProperties = __analytics.infermedicaAnalytics?.supportedProperties;
+      if(!hasSupportedProperties) {
+        return properties;
+      }
+      const defaultSupportedProperties = ['browser', 'os', 'platform', 'uid', 'date', 'environment'];
+      const supportedProperties = [...defaultSupportedProperties, ...__analytics.infermedicaAnalytics?.supportedProperties];
+      return Object.keys(properties).reduce((obj, key)=>(supportedProperties.includes(key)
+      ? {...obj, [key]: properties[key]}
+      : obj), {})
+    }
     const publishEvent = function(properties) {
-      axios.post('', properties);
+      console.log(getSupportedProperties(properties));
+      // axios.post('', getSupportedProperties(properties));
     }
     const browser = Bowser.getParser(window.navigator.userAgent);
     const staticProperties = {
