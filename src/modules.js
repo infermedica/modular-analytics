@@ -1,3 +1,6 @@
+import Bowser from "bowser";
+import firebase from "firebase/app";
+import 'firebase/auth';
 /* global __analytics */
 // Note there has been special combination of if statement applied here so the unused code can be eliminated
 // during dead code elimination process, while editing/refactoring this file please take care,
@@ -166,7 +169,26 @@ if (__analytics.amplitude?.isEnabled) {
 // --- Infermedica Analytics ---
 if(__analytics.infermedicaAnalytics?.isEnabled) {
   const infermedicaModule = function () {
-    const Bowser = require('bowser');
+    let uid = "";
+    const firebaseConfig = {
+      apiKey: __analytics.infermedicaAnalytics?.firebaseApiKey,
+      authDomain: __analytics.infermedicaAnalytics?.firebaseAuthDomain,
+      appId: __analytics.infermedicaAnalytics?.firebaseAppId,
+    };
+    firebase.initializeApp(firebaseConfig);
+    (async function () {
+      try{
+        await firebase.auth().signInAnonymously();
+      }
+      catch (err){
+        console.error(err);
+      }
+    })();
+    firebase.auth().onAuthStateChanged((user)=>{
+      if(!user) return;
+      uid = user.uid;
+    })
+
     const browser = Bowser.getParser(window.navigator.userAgent);
 
     return {
@@ -178,7 +200,7 @@ if(__analytics.infermedicaAnalytics?.isEnabled) {
           browser: browser.getBrowser(),
           os: browser.getOS(),
           platform: browser.getPlatform(),
-          user_id: '2j3k4mdk34k' // todo: add anonymous Firebase accounts
+          uid,
         }
 
         console.info('[Infermedica Analytics info]: ', Object.assign({}, commonProperties, properties));
