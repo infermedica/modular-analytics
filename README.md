@@ -34,6 +34,17 @@ new webpack.DefinePlugin({
       isEnabled: true,
       key: '<your-key>'
     },
+    infermedicaAnalytics: {
+      isEnabled: true,
+      topic: '<your-topic>',
+      environment: process.env.NODE_ENV,
+      firebaseConfig: {
+        apiKey: '<your-firebase-api-key>',
+        authDomain: '<your-firebase-auth-domain>',
+        appId: '<your-firebase-app-id>',
+      },
+      supportedProperties: ['section_name', 'section_type'], // optional
+    },
   })
 })
 ```
@@ -87,7 +98,14 @@ You can use the event for all modules or decide with modules should be used for 
 ```javascript
 Analytics.trackEvent('Event name', {
   user_rating: 5
-}, ['amlitude', 'googleTagManager'])
+}, ['aplitude', 'googleTagManager'])
+```
+
+You can disable event for all modules, e.g.:
+```javascript
+Analytics.trackEvent('Event name', {
+  user_rating: 5
+}, ['aplitude', 'googleTagManager'], true)
 ```
 ### Conversion tracking
 
