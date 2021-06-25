@@ -153,6 +153,7 @@ if (__analytics.amplitude?.isEnabled) {
         window.amplitude.getInstance().logEvent('Page Viewed', {page: viewName});
       },
       trackEvent(eventName, properties) {
+        // todo: add support for __analytics.amplitude?.properties allow to send properties
         const cleanProperties = {};
         Object.keys(properties).forEach((propName) => {
           if (properties[propName] !== null && properties[propName] !== undefined) {
@@ -170,65 +171,86 @@ if (__analytics.amplitude?.isEnabled) {
 // --- Infermedica Analytics ---
 if(__analytics.infermedicaAnalytics?.isEnabled) {
   const infermedicaModule = function () {
-    // __analytics.infermedicaAnalytics?.topic
-    // __analytics.infermedicaAnalytics?.url
-    const getSupportedProperties = function (properties) {
-      const hasSupportedProperties = __analytics.infermedicaAnalytics?.supportedProperties;
-      if(!hasSupportedProperties) {
-        return properties;
-      }
-      const defaultSupportedProperties = ['browser', 'os', 'platform', 'uid', 'date', 'environment'];
-      const supportedProperties = [...defaultSupportedProperties, ...__analytics.infermedicaAnalytics?.supportedProperties];
-      return Object.keys(properties).reduce((obj, key)=>(supportedProperties.includes(key)
-      ? {...obj, [key]: properties[key]}
-      : obj), {})
-    }
-    const publishEvent = function(properties) {
-      console.log(getSupportedProperties(properties));
-      // axios.post('', getSupportedProperties(properties));
-    }
+    const hasAuthentication = false;
+    const baseURL = 'http://localhost:3000'; // 'https://analytics-proxy.test.infermedica.com/'
+    const {topic, environment, firebaseConfig} = __analytics.infermedicaAnalytics;
     const browser = Bowser.getParser(window.navigator.userAgent);
-    const staticProperties = {
-      browser: browser.getBrowser(),
-      os: browser.getOS(),
-      platform: browser.getPlatform(),
-    };
+    const analyticsApi = axios.create({
+      baseURL,
+    });
+    const publish = async function(data) {
+      console.log('[publish]',data)
+      const publishURL = '/api/v1/publish';
+      const attributes = {
+        environment,
+      }
+      const events = [
+        {
+          data
+        }
+      ];
+      const payload = JSON.stringify({
+        topic,
+        events,
+      });
+      await analyticsApi.post(publishURL, payload);
+    }
+
     const firebaseData = {};
-    const stack = [];
-    firebase.initializeApp(__analytics.infermedicaAnalytics?.firebaseConfig);
+    firebase.initializeApp(firebaseConfig);
     (async function () {
       try {
         await firebase.auth().signInAnonymously();
       }
-      catch (err) {
-        console.error(err);
+      catch (error) {
+        console.error(error);
       }
     })();
-    firebase.auth().onAuthStateChanged(async (user)=>{
+    const eventQueue = [];
+    firebase.auth().onAuthStateChanged(async (user) => {
       if(!user) return;
       firebaseData.uid = user.uid;
       firebaseData.token = await user.getIdToken();
-      axios.defaults.headers.Authorization = `Bearer ${firebaseData.token}`;
-      stack.forEach(({staticProperties, commonProperties, properties}) => {
-        publishEvent(Object.assign({}, staticProperties, commonProperties, properties, {uid: firebaseData.uid}))
+      if(hasAuthentication) {
+        analyticsApi.defaults.headers.Authorization = `Bearer ${firebaseData.token}`
+      }
+      eventQueue.forEach((event) => {
+        const {user} = event;
+        publish({ ...event, user: {...user, id: firebaseData.uid }});
       })
     })
 
     return {
       name: 'infermedicaAnalytics',
-      trackView(viewName) {},
       trackEvent(eventName, properties) {
-        const commonProperties = {
-          date: new Date(),
-          uid: firebaseData?.uid,
-          environment: __analytics.infermedicaAnalytics?.environment
+        const supportedProperties = __analytics.infermedicaAnalytics?.properties;
+        // todo: undefined __analytics.infermedicaAnalytics?.properties allow to send properties
+        const filteredProperties = Object.keys(properties)
+          .reduce((object, key) => (supportedProperties.includes(key)
+            ? {...object, [key]: properties[key]}
+            : object
+          ), {});
+        const date = new Date();
+        const { uid } = firebaseData;
+        const {user, application} = filteredProperties;
+        const data = {
+          ...filteredProperties,
+          application: {
+            ...application,
+            date,
+          },
+          user: {
+            ...user,
+            browser: browser.getBrowser(),
+            os: browser.getOS(),
+            platform: browser.getPlatform(),
+          }
         }
-        if(!commonProperties?.uid) {
-          stack.push({staticProperties, commonProperties, properties});
+        if(!uid) {
+          eventQueue.push(data);
           return;
         }
-
-        publishEvent(Object.assign({}, staticProperties, commonProperties, properties));
+        publish(data);
       }
     }
   }
