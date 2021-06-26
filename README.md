@@ -43,7 +43,7 @@ new webpack.DefinePlugin({
         authDomain: '<your-firebase-auth-domain>',
         appId: '<your-firebase-app-id>',
       },
-      supportedProperties: ['section_name', 'section_type'], // optional
+      properties: ['application', 'user', 'section', 'event_details'], // optional
     },
   })
 })

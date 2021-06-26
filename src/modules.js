@@ -8,7 +8,16 @@ import 'firebase/auth';
 // so that the elimination process still works.
 // Also note that each analytics cannot be split into separate files, as it will break code elimination.
 const analyticModules = [];
-
+const filterProperties = (supportedProperties = [], properties) => {
+  if(supportedProperties.length > 0 ) {
+    return Object.keys(properties)
+      .reduce((object, key) => (supportedProperties.includes(key)
+          ? {...object, [key]: properties[key]}
+          : object
+      ), {});
+  }
+  return properties;
+}
 
 // --- Debug module ---
 if (__analytics.debug?.isEnabled) {
@@ -153,20 +162,18 @@ if (__analytics.amplitude?.isEnabled) {
         window.amplitude.getInstance().logEvent('Page Viewed', {page: viewName});
       },
       trackEvent(eventName, properties) {
-        // todo: add support for __analytics.amplitude?.properties allow to send properties
-        const cleanProperties = {};
-        Object.keys(properties).forEach((propName) => {
-          if (properties[propName] !== null && properties[propName] !== undefined) {
-            cleanProperties[propName] = properties[propName];
-          }
-        });
-        window.amplitude.getInstance().logEvent(eventName, cleanProperties);
+        const supportedProperties = __analytics.amplitude?.properties;
+        const filteredProperties = filterProperties(supportedProperties, properties);
+        const payload = JSON.parse(JSON.stringify(filteredProperties));
+
+        window.amplitude.getInstance().logEvent(eventName, payload);
       }
     };
   };
 
   analyticModules.push(amplitudeModule());
 }
+
 
 // --- Infermedica Analytics ---
 if(__analytics.infermedicaAnalytics?.isEnabled) {
@@ -179,7 +186,6 @@ if(__analytics.infermedicaAnalytics?.isEnabled) {
       baseURL,
     });
     const publish = async function(data) {
-      console.log('[publish]',data)
       const publishURL = '/api/v1/publish';
       const attributes = {
         environment,
@@ -193,6 +199,7 @@ if(__analytics.infermedicaAnalytics?.isEnabled) {
         topic,
         events,
       });
+
       await analyticsApi.post(publishURL, payload);
     }
 
@@ -224,12 +231,7 @@ if(__analytics.infermedicaAnalytics?.isEnabled) {
       name: 'infermedicaAnalytics',
       trackEvent(eventName, properties) {
         const supportedProperties = __analytics.infermedicaAnalytics?.properties;
-        // todo: undefined __analytics.infermedicaAnalytics?.properties allow to send properties
-        const filteredProperties = Object.keys(properties)
-          .reduce((object, key) => (supportedProperties.includes(key)
-            ? {...object, [key]: properties[key]}
-            : object
-          ), {});
+        const filteredProperties = filterProperties(supportedProperties, properties);
         const date = new Date();
         const { uid } = firebaseData;
         const {user, application} = filteredProperties;
@@ -257,5 +259,6 @@ if(__analytics.infermedicaAnalytics?.isEnabled) {
 
   analyticModules.push(infermedicaModule());
 }
+
 
 export default analyticModules;
