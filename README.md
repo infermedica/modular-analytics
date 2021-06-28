@@ -32,7 +32,9 @@ new webpack.DefinePlugin({
     },
     amplitude: {
       isEnabled: true,
-      key: '<your-key>'
+      key: '<your-key>',
+      allowProprties: [], // optional
+      disallowProperties: ['application', 'user', 'section', 'event_details'], // optional
     },
     infermedicaAnalytics: {
       isEnabled: true,
@@ -43,7 +45,8 @@ new webpack.DefinePlugin({
         authDomain: '<your-firebase-auth-domain>',
         appId: '<your-firebase-app-id>',
       },
-      properties: ['application', 'user', 'section', 'event_details'], // optional
+      allowProperties: ['application', 'user', 'section', 'event_details'], // optional
+      disallowProperties: [], // optional
     },
   })
 })
