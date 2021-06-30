@@ -253,6 +253,7 @@ if(__analytics.infermedicaAnalytics?.isEnabled) {
           },
           user: {
             ...user,
+            id: uid,
             browser: browser.getBrowser(),
             os: browser.getOS(),
             platform: browser.getPlatform(),
