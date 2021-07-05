@@ -188,7 +188,7 @@ if (__analytics.amplitude?.isEnabled) {
 if(__analytics.infermedicaAnalytics?.isEnabled) {
   const infermedicaModule = function () {
     const hasAuthentication = false;
-    const baseURL = 'http://localhost:3000'; // 'https://analytics-proxy.test.infermedica.com/'
+    const baseURL = __analytics.infermedicaAnalytics?.baseURL || 'https://analytics-proxy.test.infermedica.com/';
     const {topic, environment, firebaseConfig} = __analytics.infermedicaAnalytics;
     const browser = Bowser.getParser(window.navigator.userAgent);
     const analyticsApi = axios.create({
