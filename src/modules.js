@@ -247,9 +247,9 @@ if(__analytics.infermedicaAnalytics?.isEnabled) {
         const {user, application} = filteredProperties;
         const data = {
           ...filteredProperties,
+          date,
           application: {
             ...application,
-            date,
           },
           user: {
             ...user,
@@ -257,6 +257,15 @@ if(__analytics.infermedicaAnalytics?.isEnabled) {
             browser: browser.getBrowser(),
             os: browser.getOS(),
             platform: browser.getPlatform(),
+          },
+          event_details: {
+            event_type: '',
+            event_objects: '',
+            event_data: {
+              type: '',
+              data: [],
+            },
+            ...filteredProperties.event_details,
           }
         }
         if(!uid) {
