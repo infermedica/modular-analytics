@@ -264,7 +264,7 @@ if(__analytics.infermedicaAnalytics?.isEnabled) {
           },
           event_details: {
             event_type: '',
-            event_objects: '',
+            event_object: '',
             event_data: {
               type: '',
               data: [],
