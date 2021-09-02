@@ -191,8 +191,12 @@ if(__analytics.infermedicaAnalytics?.isEnabled) {
     const baseURL = __analytics.infermedicaAnalytics?.baseURL || 'https://analytics-proxy.test.infermedica.com/';
     const {topic, environment, firebaseConfig} = __analytics.infermedicaAnalytics;
     const browser = Bowser.getParser(window.navigator.userAgent);
+    const headers = {
+      'infer-application-id': __analytics.infermedicaAnalytics?.appId
+    }
     const analyticsApi = axios.create({
       baseURL,
+      headers
     });
     const publish = async function(data) {
       const publishURL = '/api/v1/publish';
@@ -201,7 +205,8 @@ if(__analytics.infermedicaAnalytics?.isEnabled) {
       }
       const events = [
         {
-          data
+          data,
+          attributes
         }
       ];
       const payload = JSON.stringify({
