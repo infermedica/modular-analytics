@@ -187,7 +187,6 @@ if (__analytics.amplitude?.isEnabled) {
 // --- Infermedica Analytics ---
 if(__analytics.infermedicaAnalytics?.isEnabled) {
   const infermedicaModule = function () {
-    const hasAuthentication = false;
     const baseURL = __analytics.infermedicaAnalytics?.baseURL || 'https://analytics-proxy.test.infermedica.com/';
     const {topic, environment, firebaseConfig} = __analytics.infermedicaAnalytics;
     const browser = Bowser.getParser(window.navigator.userAgent);
@@ -232,9 +231,7 @@ if(__analytics.infermedicaAnalytics?.isEnabled) {
       if(!user) return;
       firebaseData.uid = user.uid;
       firebaseData.token = await user.getIdToken();
-      if(hasAuthentication) {
-        analyticsApi.defaults.headers.Authorization = `Bearer ${firebaseData.token}`
-      }
+      analyticsApi.defaults.headers.Authorization = `Bearer ${firebaseData.token}`
       eventQueue.forEach((event) => {
         const {user} = event;
         publish({ ...event, user: {...user, id: firebaseData.uid }});
