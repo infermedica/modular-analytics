@@ -188,7 +188,7 @@ if (__analytics.amplitude?.isEnabled) {
 if(__analytics.infermedicaAnalytics?.isEnabled) {
   const infermedicaModule = function () {
     const baseURL = __analytics.infermedicaAnalytics?.baseURL || 'https://analytics-proxy.test.infermedica.com/';
-    const {topic, environment, firebaseConfig} = __analytics.infermedicaAnalytics;
+    const {environment, firebaseConfig} = __analytics.infermedicaAnalytics;
     const browser = Bowser.getParser(window.navigator.userAgent);
     const headers = {
       'infer-application-id': __analytics.infermedicaAnalytics?.appId
@@ -202,6 +202,7 @@ if(__analytics.infermedicaAnalytics?.isEnabled) {
       const attributes = {
         environment,
       }
+      const {topic, ...properties} = data;
       const events = [
         {
           data,
@@ -209,7 +210,7 @@ if(__analytics.infermedicaAnalytics?.isEnabled) {
         }
       ];
       const payload = JSON.stringify({
-        topic,
+        topic: topic || __analytics.infermedicaAnalytics.topic,
         events,
       });
 
