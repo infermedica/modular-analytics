@@ -18,13 +18,28 @@
     "analytics"
   ],
   "eslintConfig": {
-    "ignorePatterns": [
-      "**/src/*.js"
-    ]
+    "env": {
+      "browser": true,
+      "es2021": true
+    },
+    "extends": [
+      "airbnb-base"
+    ],
+    "parserOptions": {
+      "ecmaVersion": 12,
+      "sourceType": "module"
+    },
+    "rules": {
+    }
   },
   "dependencies": {
     "axios": "^0.21.1",
     "bowser": "^2.11.0",
     "firebase": "^8.6.7"
+  },
+  "devDependencies": {
+    "eslint": "^7.32.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.25.2"
   }
 }
