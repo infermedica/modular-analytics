@@ -9,6 +9,10 @@ Only basic functionality of tracking page views and events is currently supporte
 $ npm install --save-dev @infermedica/modular-analytics
 ```
 
+To use infermedicaAnalytics you should install peerDependencies
+```bash
+$ npm install axios bowser firebase
+```
 ## Configuration
 
 The analytics interfaces has to be configured in Webpack configuration file through `webpack.DefinePlugin`:
