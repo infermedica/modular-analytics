@@ -1,12 +1,15 @@
-// import axios from 'axios';
-// import Bowser from 'bowser';
-// import firebase from 'firebase/app';
-// import 'firebase/auth';
 /* global __analytics */
 // Note there has been special combination of if statement applied here so the unused code can be eliminated
 // during dead code elimination process, while editing/refactoring this file please take care,
 // so that the elimination process still works.
 // Also note that each analytics cannot be split into separate files, as it will break code elimination.
+const names = {
+  DEBUG: 'debug',
+  GOOGLE_TAG_MANAGE: 'googleTagManager',
+  GOOGLE_ANALYTICS: 'googleAnalytics',
+  AMPLITUDE: 'amplitude',
+  INFERMEDICA_ANALYTICS: 'infermedicaAnalytics'
+}
 const analyticModules = [];
 const filterProperties = (allowProperties = [], disallowProperties = [], properties) => {
   let eventProperties = properties;
@@ -33,7 +36,7 @@ if (__analytics.debug?.isEnabled) {
     console.log('Analytics (initialization)');
 
     return {
-      name: 'debug',
+      name: names.DEBUG,
       trackView(viewName) {
         console.log('Analytics (trackView):', viewName);
       },
@@ -73,7 +76,7 @@ if (__analytics.googleTagManager?.isEnabled) {
     }
 
     return {
-      name: 'googleTagManager',
+      name: names.GOOGLE_TAG_MANAGE,
       trackView(viewName) {
         window.gtag('event', 'page_view');
       },
@@ -111,7 +114,7 @@ else if (__analytics.googleAnalytics?.isEnabled) {
     window.ga('set', 'anonymizeIp', true);
 
     return {
-      name: 'googleAnalytics',
+      name: name.GOOGLE_ANALYTICS,
       trackView(viewName) {
         window.ga('send', 'pageview', viewName || window.location.pathname);
       },
@@ -162,7 +165,7 @@ if (__analytics.amplitude?.isEnabled) {
     });
 
     return {
-      name: 'amplitude',
+      name: names.AMPLITUDE,
       trackView(viewName) {
         window.amplitude.getInstance().logEvent('Page Viewed', { page: viewName });
       },
@@ -236,7 +239,7 @@ if (__analytics.amplitude?.isEnabled) {
       });
 
       return {
-        name: 'infermedicaAnalytics',
+        name: names.INFERMEDICA_ANALYTICS,
         trackEvent(eventName, properties) {
           // prevent to send event without event_details
           if (!properties.event_details) {
