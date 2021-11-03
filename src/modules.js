@@ -1,6 +1,6 @@
-import axios from "axios";
-import Bowser from "bowser";
-import firebase from "firebase/app";
+import axios from 'axios';
+import Bowser from 'bowser';
+import firebase from 'firebase/app';
 import 'firebase/auth';
 /* global __analytics */
 // Note there has been special combination of if statement applied here so the unused code can be eliminated
@@ -10,22 +10,22 @@ import 'firebase/auth';
 const analyticModules = [];
 const filterProperties = (allowProperties = [], disallowProperties = [], properties) => {
   let eventProperties = properties;
-  if(allowProperties.length > 0 ) {
-    eventProperties =  Object.keys(eventProperties)
+  if (allowProperties.length > 0) {
+    eventProperties = Object.keys(eventProperties)
       .reduce((object, key) => (allowProperties.includes(key)
-          ? {...object, [key]: eventProperties[key]}
-          : object
+        ? { ...object, [key]: eventProperties[key] }
+        : object
       ), {});
   }
-  if(disallowProperties.length > 0 ) {
-    eventProperties =  Object.keys(eventProperties)
+  if (disallowProperties.length > 0) {
+    eventProperties = Object.keys(eventProperties)
       .reduce((object, key) => (disallowProperties.includes(key)
-          ? object
-          : {...object, [key]: eventProperties[key]}
+        ? object
+        : { ...object, [key]: eventProperties[key] }
       ), {});
   }
   return eventProperties;
-}
+};
 
 // --- Debug module ---
 if (__analytics.debug?.isEnabled) {
@@ -39,13 +39,12 @@ if (__analytics.debug?.isEnabled) {
       },
       trackEvent(eventName, properties) {
         console.log('Analytics (trackEvent):', eventName, properties);
-      }
+      },
     };
   };
 
   analyticModules.push(debugModule());
 }
-
 
 // --- Google Tag Manager ---
 if (__analytics.googleTagManager?.isEnabled) {
@@ -59,18 +58,18 @@ if (__analytics.googleTagManager?.isEnabled) {
     /* eslint-enable */
 
     window.dataLayer = window.dataLayer || [];
-    window.gtag = function (){window.dataLayer.push(arguments);}
+    window.gtag = function () { window.dataLayer.push(arguments); };
     window.gtag('js', new Date());
 
     if (__analytics.googleAnalytics.isEnabled) {
       window.gtag('config', __analytics.googleAnalytics.key, {
         send_page_view: false,
-        anonymize_ip: true
+        anonymize_ip: true,
       });
     }
 
     if (__analytics.googleAdWords.isEnabled) {
-      window.gtag('config', __analytics.googleAdWords.key, {anonymize_ip: true});
+      window.gtag('config', __analytics.googleAdWords.key, { anonymize_ip: true });
     }
 
     return {
@@ -80,22 +79,21 @@ if (__analytics.googleTagManager?.isEnabled) {
       },
       trackEvent(eventName, properties) {
         window.gtag('event', eventName, {
-          event_category: 'Event'
+          event_category: 'Event',
         });
       },
       trackConversion(conversionLabel) {
         if (__analytics.googleAdWords.isEnabled) {
           window.gtag('event', 'conversion', {
-            send_to: __analytics.googleAdWords.key + '/' + conversionLabel
+            send_to: `${__analytics.googleAdWords.key}/${conversionLabel}`,
           });
         }
-      }
+      },
     };
   };
 
   analyticModules.push(googleAnalyticsModule());
 }
-
 
 // --- Google Analytics ---
 else if (__analytics.googleAnalytics?.isEnabled) {
@@ -120,15 +118,14 @@ else if (__analytics.googleAnalytics?.isEnabled) {
       trackEvent(eventName, properties) {
         window.ga('send', 'event', {
           eventCategory: 'Event',
-          eventAction: eventName
+          eventAction: eventName,
         });
-      }
+      },
     };
   };
 
   analyticModules.push(googleAnalyticsModule());
 }
-
 
 // --- Amplitude ---
 if (__analytics.amplitude?.isEnabled) {
@@ -160,14 +157,14 @@ if (__analytics.amplitude?.isEnabled) {
       trackingOptions: {
         carrier: false,
         dma: false,
-        ip_address: false
-      }
+        ip_address: false,
+      },
     });
 
     return {
       name: 'amplitude',
       trackView(viewName) {
-        window.amplitude.getInstance().logEvent('Page Viewed', {page: viewName});
+        window.amplitude.getInstance().logEvent('Page Viewed', { page: viewName });
       },
       trackEvent(eventName, properties) {
         const allowProperties = __analytics.amplitude?.allowProperties;
@@ -176,38 +173,37 @@ if (__analytics.amplitude?.isEnabled) {
         const payload = JSON.parse(JSON.stringify(filteredProperties));
 
         window.amplitude.getInstance().logEvent(eventName, payload);
-      }
+      },
     };
   };
 
   analyticModules.push(amplitudeModule());
 }
 
-
 // --- Infermedica Analytics ---
-if(__analytics.infermedicaAnalytics?.isEnabled) {
+if (__analytics.infermedicaAnalytics?.isEnabled) {
   const infermedicaModule = function () {
     const baseURL = __analytics.infermedicaAnalytics?.baseURL || 'https://analytics-proxy.test.infermedica.com/';
-    const {environment, firebaseConfig} = __analytics.infermedicaAnalytics;
+    const { environment, firebaseConfig } = __analytics.infermedicaAnalytics;
     const browser = Bowser.getParser(window.navigator.userAgent);
     const headers = {
-      'infer-application-id': __analytics.infermedicaAnalytics?.appId
-    }
+      'infer-application-id': __analytics.infermedicaAnalytics?.appId,
+    };
     const analyticsApi = axios.create({
       baseURL,
-      headers
+      headers,
     });
-    const publish = async function(data) {
+    const publish = async function (data) {
       const publishURL = '/api/v1/publish';
       const attributes = {
         environment,
-      }
-      const {topic, ...properties} = data;
+      };
+      const { topic, ...properties } = data;
       const events = [
         {
           data,
-          attributes
-        }
+          attributes,
+        },
       ];
       const payload = JSON.stringify({
         topic: topic || __analytics.infermedicaAnalytics.topic,
@@ -215,29 +211,28 @@ if(__analytics.infermedicaAnalytics?.isEnabled) {
       });
 
       await analyticsApi.post(publishURL, payload);
-    }
+    };
 
     const firebaseData = {};
     firebase.initializeApp(firebaseConfig);
     (async function () {
       try {
         await firebase.auth().signInAnonymously();
-      }
-      catch (error) {
+      } catch (error) {
         console.error(error);
       }
-    })();
+    }());
     const eventQueue = [];
     firebase.auth().onAuthStateChanged(async (user) => {
-      if(!user) return;
+      if (!user) return;
       firebaseData.uid = user.uid;
       firebaseData.token = await user.getIdToken();
-      analyticsApi.defaults.headers.Authorization = `Bearer ${firebaseData.token}`
+      analyticsApi.defaults.headers.Authorization = `Bearer ${firebaseData.token}`;
       eventQueue.forEach((event) => {
-        const {user} = event;
-        publish({ ...event, user: {...user, id: firebaseData.uid }});
-      })
-    })
+        const { user } = event;
+        publish({ ...event, user: { ...user, id: firebaseData.uid } });
+      });
+    });
 
     return {
       name: 'infermedicaAnalytics',
@@ -251,7 +246,7 @@ if(__analytics.infermedicaAnalytics?.isEnabled) {
         const filteredProperties = filterProperties(allowProperties, disallowProperties, properties);
         const date = new Date();
         const { uid } = firebaseData;
-        const {user, application} = filteredProperties;
+        const { user, application } = filteredProperties;
         const data = {
           ...filteredProperties,
           date,
@@ -273,19 +268,18 @@ if(__analytics.infermedicaAnalytics?.isEnabled) {
               data: [],
             },
             ...filteredProperties.event_details,
-          }
-        }
-        if(!uid) {
+          },
+        };
+        if (!uid) {
           eventQueue.push(data);
           return;
         }
         publish(data);
-      }
-    }
-  }
+      },
+    };
+  };
 
   analyticModules.push(infermedicaModule());
 }
-
 
 export default analyticModules;

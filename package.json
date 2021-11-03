@@ -32,6 +32,9 @@
     "rules": {
     }
   },
+  "scripts": {
+    "lint": "eslint src/*js --fix"
+  },
   "dependencies": {
     "axios": "^0.21.1",
     "bowser": "^2.11.0",

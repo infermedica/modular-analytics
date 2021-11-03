@@ -3,21 +3,21 @@ import analyticModules from './modules';
 const globalProperties = {};
 
 export const Analytics = {
-  trackView(viewName, properties, modules, disabled = false ) {
-    if(disabled) return;
+  trackView(viewName, properties, modules, disabled = false) {
+    if (disabled) return;
     analyticModules.forEach((analyticModule) => {
-      if(modules && !modules.includes(analyticModule.name)) return;
+      if (modules && !modules.includes(analyticModule.name)) return;
       analyticModule.trackView && analyticModule.trackView(
-        viewName, Object.assign({}, globalProperties, properties)
+        viewName, { ...globalProperties, ...properties },
       );
     });
   },
-  trackEvent(eventName, properties, modules, disabled = false ) {
-    if(disabled) return;
+  trackEvent(eventName, properties, modules, disabled = false) {
+    if (disabled) return;
     analyticModules.forEach((analyticModule) => {
-      if(modules && !modules.includes(analyticModule.name)) return;
+      if (modules && !modules.includes(analyticModule.name)) return;
       analyticModule.trackEvent && analyticModule.trackEvent(
-        eventName, Object.assign({}, globalProperties, properties)
+        eventName, { ...globalProperties, ...properties },
       );
     });
   },
@@ -32,7 +32,7 @@ export const Analytics = {
     } else if (typeof property === 'string') {
       globalProperties[property] = value;
     }
-  }
+  },
 };
 
 export const VueAnalytics = {
@@ -43,8 +43,8 @@ export const VueAnalytics = {
       $analytics: {
         get() {
           return Vue.$analytics;
-        }
-      }
+        },
+      },
     });
-  }
+  },
 };
