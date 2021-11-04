@@ -8,8 +8,8 @@ const names = {
   GOOGLE_TAG_MANAGE: 'googleTagManager',
   GOOGLE_ANALYTICS: 'googleAnalytics',
   AMPLITUDE: 'amplitude',
-  INFERMEDICA_ANALYTICS: 'infermedicaAnalytics'
-}
+  INFERMEDICA_ANALYTICS: 'infermedicaAnalytics',
+};
 const analyticModules = [];
 const filterProperties = (allowProperties = [], disallowProperties = [], properties) => {
   let eventProperties = properties;
@@ -173,7 +173,12 @@ if (__analytics.amplitude?.isEnabled) {
         const allowProperties = __analytics.amplitude?.allowProperties;
         const disallowProperties = __analytics.amplitude?.disallowProperties;
         const filteredProperties = filterProperties(allowProperties, disallowProperties, properties);
-        const payload = JSON.parse(JSON.stringify(filteredProperties));
+        // const payload = JSON.parse(JSON.stringify(filteredProperties));
+        const payload = Object.keys(filteredProperties).reduce((object, key) => (
+          filteredProperties[key]
+            ? { ...object, [key]: filteredProperties[key] }
+            : object
+        ), {});
 
         window.amplitude.getInstance().logEvent(eventName, payload);
       },
