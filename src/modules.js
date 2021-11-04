@@ -197,7 +197,7 @@ if (__analytics.amplitude?.isEnabled) {
     const { getAuth, signInAnonymously, onAuthStateChanged } = await import('firebase/auth');
 
     const infermedicaModule = function () {
-      const baseURL = __analytics.infermedicaAnalytics?.baseURL || 'https://analytics-proxy.test.infermedica.com/';
+      const baseURL = __analytics.infermedicaAnalytics?.baseURL || 'https://analytics-proxy.infermedica.com/';
       const { environment, firebaseConfig } = __analytics.infermedicaAnalytics;
       const browser = Bowser.getParser(window.navigator.userAgent);
       const headers = {
