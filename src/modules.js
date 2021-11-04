@@ -12,22 +12,10 @@ const names = {
 };
 const analyticModules = [];
 const filterProperties = (allowProperties = [], disallowProperties = [], properties) => {
-  let eventProperties = properties;
-  if (allowProperties.length > 0) {
-    eventProperties = Object.keys(eventProperties)
-      .reduce((object, key) => (allowProperties.includes(key)
-        ? { ...object, [key]: eventProperties[key] }
-        : object
-      ), {});
-  }
-  if (disallowProperties.length > 0) {
-    eventProperties = Object.keys(eventProperties)
-      .reduce((object, key) => (disallowProperties.includes(key)
-        ? object
-        : { ...object, [key]: eventProperties[key] }
-      ), {});
-  }
-  return eventProperties;
+  return Object.keys(properties)
+    .filter((key)=>(allowProperties.length < 1 || allowProperties.includes(key)))
+    .filter((key)=>(disallowProperties.length < 1 || !disallowProperties.includes(key)))
+    .reduce((object, key)=>({...object, [key]: properties[key]}), {});
 };
 
 // --- Debug module ---
