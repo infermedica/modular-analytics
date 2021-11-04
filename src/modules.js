@@ -231,7 +231,7 @@ if (__analytics.amplitude?.isEnabled) {
       initializeApp(firebaseConfig);
       const auth = getAuth();
       signInAnonymously(auth);
-      const eventQueue = [];
+      let eventQueue = [];
       onAuthStateChanged(auth, async (user) => {
         if (!user) return;
         firebaseData.uid = user.uid;
@@ -241,6 +241,7 @@ if (__analytics.amplitude?.isEnabled) {
           const { user } = event;
           publish({ ...event, user: { ...user, id: firebaseData.uid } });
         });
+        eventQueue = [];
       });
 
       return {
