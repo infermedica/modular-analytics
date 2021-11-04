@@ -108,12 +108,6 @@ Analytics.trackEvent('Event name', {
 }, ['aplitude', 'googleTagManager'])
 ```
 
-You can disable event for all modules, e.g.:
-```javascript
-Analytics.trackEvent('Event name', {
-  user_rating: 5
-}, ['aplitude', 'googleTagManager'], true)
-```
 ### Conversion tracking
 
 To track events, use:
