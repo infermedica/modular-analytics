@@ -161,7 +161,6 @@ if (__analytics.amplitude?.isEnabled) {
         const allowProperties = __analytics.amplitude?.allowProperties;
         const disallowProperties = __analytics.amplitude?.disallowProperties;
         const filteredProperties = filterProperties(allowProperties, disallowProperties, properties);
-        // const payload = JSON.parse(JSON.stringify(filteredProperties));
         const payload = Object.keys(filteredProperties).reduce((object, key) => (
           filteredProperties[key]
             ? { ...object, [key]: filteredProperties[key] }
@@ -207,10 +206,10 @@ if (__analytics.amplitude?.isEnabled) {
             attributes,
           },
         ];
-        const payload = JSON.stringify({
+        const payload = {
           topic: topic || __analytics.infermedicaAnalytics.topic,
           events,
-        });
+        };
 
         await analyticsApi.post(publishURL, payload);
       };
