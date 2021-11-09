@@ -221,7 +221,7 @@ if (__analytics.amplitude?.isEnabled) {
       let eventQueue = [];
       onAuthStateChanged(auth, async (user) => {
         if (!user) return;
-        firebaseData.uid = user.uid;
+        firebaseData.uid = null;
         firebaseData.token = await user.getIdToken();
         analyticsApi.defaults.headers.Authorization = `Bearer ${firebaseData.token}`;
         eventQueue.forEach((event) => {
@@ -242,7 +242,7 @@ if (__analytics.amplitude?.isEnabled) {
           const disallowProperties = __analytics.infermedicaAnalytics?.disallowProperties;
           const filteredProperties = filterProperties(allowProperties, disallowProperties, properties);
           const date = new Date();
-          const { uid } = firebaseData;
+          const { uid, token } = firebaseData;
           const { user, application } = filteredProperties;
           const data = {
             ...filteredProperties,
@@ -267,7 +267,7 @@ if (__analytics.amplitude?.isEnabled) {
               ...filteredProperties.event_details,
             },
           };
-          if (!uid) {
+          if (!token) {
             eventQueue.push(data);
             return;
           }
