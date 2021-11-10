@@ -11,12 +11,10 @@ const names = {
   INFERMEDICA_ANALYTICS: 'infermedicaAnalytics',
 };
 const analyticModules = [];
-const filterProperties = (allowProperties = [], disallowProperties = [], properties) => {
-  return Object.keys(properties)
-    .filter((key)=>(allowProperties.length < 1 || allowProperties.includes(key)))
-    .filter((key)=>(disallowProperties.length < 1 || !disallowProperties.includes(key)))
-    .reduce((object, key)=>({...object, [key]: properties[key]}), {});
-};
+const filterProperties = (allowProperties = [], disallowProperties = [], properties) => Object.keys(properties)
+  .filter((key) => (allowProperties.length < 1 || allowProperties.includes(key)))
+  .filter((key) => (disallowProperties.length < 1 || !disallowProperties.includes(key)))
+  .reduce((object, key) => ({ ...object, [key]: properties[key] }), {});
 
 // --- Debug module ---
 if (__analytics.debug?.isEnabled) {
@@ -221,7 +219,9 @@ if (__analytics.amplitude?.isEnabled) {
       let eventQueue = [];
       onAuthStateChanged(auth, async (user) => {
         if (!user) return;
-        firebaseData.uid = null;
+        firebaseData.uid = __analytics.infermedicaAnalytics?.sendUID
+          ? user.uid
+          : null;
         firebaseData.token = await user.getIdToken();
         analyticsApi.defaults.headers.Authorization = `Bearer ${firebaseData.token}`;
         eventQueue.forEach((event) => {

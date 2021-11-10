@@ -40,6 +40,7 @@ new webpack.DefinePlugin({
       isEnabled: true,
       topic: '<your-topic>',
       environment: process.env.NODE_ENV,
+      sendUID: false, // false by default, allow to send firebase UID 
       firebaseConfig: {
         apiKey: '<your-firebase-api-key>',
         authDomain: '<your-firebase-auth-domain>',
