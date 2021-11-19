@@ -192,6 +192,7 @@ if (__analytics.amplitude?.isEnabled) {
         baseURL,
         headers,
       });
+      let firebaseUser = null;
       const publish = async function (data) {
         const publishURL = '/api/v1/publish';
         const attributes = {
@@ -208,25 +209,29 @@ if (__analytics.amplitude?.isEnabled) {
           topic: topic || __analytics.infermedicaAnalytics.topic,
           events,
         };
-
+        const token = await firebaseUser.getIdToken();
+        analyticsApi.defaults.headers.Authorization = `Bearer ${token}`;
         await analyticsApi.post(publishURL, payload);
       };
-
-      const firebaseData = {};
       initializeApp(firebaseConfig);
       const auth = getAuth();
       signInAnonymously(auth);
       let eventQueue = [];
+      const getUid = () => (__analytics.infermedicaAnalytics?.sendUID
+        ? firebaseUser.uid
+        : null);
       onAuthStateChanged(auth, async (user) => {
         if (!user) return;
-        firebaseData.uid = __analytics.infermedicaAnalytics?.sendUID
-          ? user.uid
-          : null;
-        firebaseData.token = await user.getIdToken();
-        analyticsApi.defaults.headers.Authorization = `Bearer ${firebaseData.token}`;
+        firebaseUser = user;
         eventQueue.forEach((event) => {
           const { user } = event;
-          publish({ ...event, user: { ...user, id: firebaseData.uid } });
+          publish({
+            ...event,
+            user: {
+              ...user,
+              id: getUid(),
+            },
+          });
         });
         eventQueue = [];
       });
@@ -242,7 +247,6 @@ if (__analytics.amplitude?.isEnabled) {
           const disallowProperties = __analytics.infermedicaAnalytics?.disallowProperties;
           const filteredProperties = filterProperties(allowProperties, disallowProperties, properties);
           const date = new Date();
-          const { uid, token } = firebaseData;
           const { user, application } = filteredProperties;
           const data = {
             ...filteredProperties,
@@ -252,7 +256,7 @@ if (__analytics.amplitude?.isEnabled) {
             },
             user: {
               ...user,
-              id: uid,
+              id: getUid(),
               browser: browser.getBrowser(),
               os: browser.getOS(),
               platform: browser.getPlatform(),
@@ -267,7 +271,7 @@ if (__analytics.amplitude?.isEnabled) {
               ...filteredProperties.event_details,
             },
           };
-          if (!token) {
+          if (!firebaseUser) {
             eventQueue.push(data);
             return;
           }
