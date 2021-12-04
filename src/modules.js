@@ -10,6 +10,7 @@ const names = {
   AMPLITUDE: 'amplitude',
   INFERMEDICA_ANALYTICS: 'infermedicaAnalytics',
 };
+const defaultApplicationName = '[DEFAULT]';
 const analyticModules = [];
 const filterProperties = (allowProperties = [], disallowProperties = [], properties) => Object.keys(properties)
   .filter((key) => (allowProperties.length < 1 || allowProperties.includes(key)))
@@ -183,7 +184,7 @@ if (__analytics.amplitude?.isEnabled) {
 
     const infermedicaModule = function () {
       const baseURL = __analytics.infermedicaAnalytics?.baseURL || 'https://analytics-proxy.infermedica.com/';
-      const { environment, firebaseConfig } = __analytics.infermedicaAnalytics;
+      const { environment, firebaseConfig, firebaseApplicationName } = __analytics.infermedicaAnalytics;
       const browser = Bowser.getParser(window.navigator.userAgent);
       const headers = {
         'infer-application-id': __analytics.infermedicaAnalytics?.appId,
@@ -213,8 +214,11 @@ if (__analytics.amplitude?.isEnabled) {
         analyticsApi.defaults.headers.Authorization = `Bearer ${token}`;
         await analyticsApi.post(publishURL, payload);
       };
-      initializeApp(firebaseConfig);
-      const auth = getAuth();
+
+      const applicationName = firebaseApplicationName || defaultApplicationName;
+      const firebaseApp = initializeApp(firebaseConfig, applicationName);
+      const auth = getAuth(firebaseApp);
+
       signInAnonymously(auth);
       let eventQueue = [];
       const getUid = () => (__analytics.infermedicaAnalytics?.sendUID
