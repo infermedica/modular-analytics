@@ -1,8 +1,30 @@
+// @ts-check
 import analyticModules from './modules';
 
 const globalProperties = {};
 
 export const Analytics = {
+  /**
+   * @param {import("./main").IInitializeParams} options
+   */
+  initialize(options) {
+    const optionsData = {
+      firebaseAuth: null,
+      firebaseAppInstance: null,
+      signInAnonymously: false,
+      ...options,
+    };
+    analyticModules
+      .forEach((analyticModule) => analyticModule.initialize
+      && analyticModule.initialize(optionsData));
+  },
+
+  /**
+   * @param {string} viewName
+   * @param {object} properties
+   * @param {Array} modules
+   * @param {boolean} disabled
+   */
   trackView(viewName, properties, modules) {
     analyticModules.forEach((analyticModule) => {
       if (modules && !modules.includes(analyticModule.name)) return;
@@ -11,6 +33,13 @@ export const Analytics = {
       );
     });
   },
+
+  /**
+   * @param {string} eventName
+   * @param {object} properties
+   * @param {Array} modules
+   * @param {boolean} disabled
+   */
   trackEvent(eventName, properties, modules) {
     analyticModules.forEach((analyticModule) => {
       if (modules && !modules.includes(analyticModule.name)) return;
@@ -19,11 +48,20 @@ export const Analytics = {
       );
     });
   },
+
+  /**
+   * @param {string} conversionLabel
+   */
   trackConversion(conversionLabel) {
     analyticModules.forEach((analyticModule) => {
       analyticModule.trackConversion && analyticModule.trackConversion(conversionLabel);
     });
   },
+
+  /**
+   * @param {string|object} property
+   * @param {number|undefined} value
+   */
   setGlobalProperties(property, value) {
     if (typeof property === 'object') {
       Object.assign(globalProperties, property);

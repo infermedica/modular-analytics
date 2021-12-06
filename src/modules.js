@@ -12,9 +12,16 @@ const names = {
 };
 const defaultApplicationName = '[DEFAULT]';
 const analyticModules = [];
-const filterProperties = (allowProperties = [], disallowProperties = [], properties) => Object.keys(properties)
-  .filter((key) => (allowProperties.length < 1 || allowProperties.includes(key)))
-  .filter((key) => (disallowProperties.length < 1 || !disallowProperties.includes(key)))
+const filterProperties = (
+  allowProperties = [], disallowProperties = [], properties,
+) => Object.keys(
+  properties,
+)
+  .filter(
+    (key) => (allowProperties.length < 1 || allowProperties.includes(key)),
+  )
+  .filter((key) => (disallowProperties.length < 1
+    || !disallowProperties.includes(key)))
   .reduce((object, key) => ({ ...object, [key]: properties[key] }), {});
 
 // --- Debug module ---
@@ -41,14 +48,20 @@ if (__analytics.googleTagManager?.isEnabled) {
   const googleAnalyticsModule = function () {
     /* eslint-disable */
     // @formatter:off
-    (function(s,o,g,a,m){a=s.createElement(o),
-    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-    })(document,'script','https://www.googletagmanager.com/gtag/js');
+    (function(s, o, g, a, m) {
+      a = s.createElement(o),
+        m = s.getElementsByTagName(o)[0];
+      a.async = 1;
+      a.src = g;
+      m.parentNode.insertBefore(a, m);
+    })(document, 'script', 'https://www.googletagmanager.com/gtag/js');
     // @formatter:on
     /* eslint-enable */
 
     window.dataLayer = window.dataLayer || [];
-    window.gtag = function () { window.dataLayer.push(arguments); };
+    window.gtag = function () {
+      window.dataLayer.push(arguments);
+    };
     window.gtag('js', new Date());
 
     if (__analytics.googleAnalytics.isEnabled) {
@@ -59,7 +72,8 @@ if (__analytics.googleTagManager?.isEnabled) {
     }
 
     if (__analytics.googleAdWords.isEnabled) {
-      window.gtag('config', __analytics.googleAdWords.key, { anonymize_ip: true });
+      window.gtag('config', __analytics.googleAdWords.key,
+        { anonymize_ip: true });
     }
 
     return {
@@ -90,14 +104,23 @@ else if (__analytics.googleAnalytics?.isEnabled) {
   const googleAnalyticsModule = function () {
     /* eslint-disable */
     // @formatter:off
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+    (function(i, s, o, g, r, a, m) {
+      i['GoogleAnalyticsObject'] = r;
+      i[r] = i[r] || function() {
+        (i[r].q = i[r].q || []).push(arguments);
+      }, i[r].l = 1 * new Date();
+      a = s.createElement(o),
+        m = s.getElementsByTagName(o)[0];
+      a.async = 1;
+      a.src = g;
+      m.parentNode.insertBefore(a, m);
+    })(window, document, 'script',
+      'https://www.google-analytics.com/analytics.js', 'ga');
     // @formatter:on
     /* eslint-enable */
 
-    window.ga('create', __analytics.googleAnalytics.key, window.location.hostname);
+    window.ga('create', __analytics.googleAnalytics.key,
+      window.location.hostname);
     window.ga('set', 'anonymizeIp', true);
 
     return {
@@ -122,22 +145,107 @@ if (__analytics.amplitude?.isEnabled) {
   const amplitudeModule = function () {
     /* eslint-disable */
     // @formatter:off
-    (function(e,t){var n=e.amplitude||{_q:[],_iq:{}};var r=t.createElement("script");r.type="text/javascript"
-    ;r.integrity="sha384-d/yhnowERvm+7eCU79T/bYjOiMmq4F11ElWYLmt0ktvYEVgqLDazh4+gW9CKMpYW";r.crossOrigin="anonymous"
-    ;r.async=true;r.src="https://cdn.amplitude.com/libs/amplitude-5.2.2-min.gz.js";r.onload=function(){
-    if(!e.amplitude.runQueuedFunctions){console.log("[Amplitude] Error: could not load SDK")}}
-    ;var i=t.getElementsByTagName("script")[0];i.parentNode.insertBefore(r,i);function s(e,t){
-    e.prototype[t]=function(){this._q.push([t].concat(Array.prototype.slice.call(arguments,0)));return this}}
-    var o=function(){this._q=[];return this};var a=["add","append","clearAll","prepend","set","setOnce","unset"]
-    ;for(var u=0;u<a.length;u++){s(o,a[u])}n.Identify=o;var c=function(){this._q=[];return this}
-    ;var l=["setProductId","setQuantity","setPrice","setRevenueType","setEventProperties"];for(var p=0;p<l.length;p++){
-    s(c,l[p])}n.Revenue=c;var d=["init","logEvent","logRevenue","setUserId","setUserProperties","setOptOut",
-    "setVersionName","setDomain","setDeviceId","setGlobalUserProperties","identify","clearUserProperties","setGroup",
-    "logRevenueV2","regenerateDeviceId","groupIdentify","onInit","logEventWithTimestamp","logEventWithGroups",
-    "setSessionId","resetSessionId"];function v(e){function t(t){e[t]=function(){e._q.push([t].concat(
-    Array.prototype.slice.call(arguments,0)))}}for(var n=0;n<d.length;n++){t(d[n])}}v(n);
-    n.getInstance=function(e){e=(!e||e.length===0?"$default_instance":e).toLowerCase();if(!n._iq.hasOwnProperty(e)){
-    n._iq[e]={_q:[]};v(n._iq[e])}return n._iq[e]};e.amplitude=n})(window,document);
+    (function(e, t) {
+      var n = e.amplitude || {_q: [], _iq: {}};
+      var r = t.createElement('script');
+      r.type = 'text/javascript'
+      ;r.integrity = 'sha384-d/yhnowERvm+7eCU79T/bYjOiMmq4F11ElWYLmt0ktvYEVgqLDazh4+gW9CKMpYW';
+      r.crossOrigin = 'anonymous'
+      ;r.async = true;
+      r.src = 'https://cdn.amplitude.com/libs/amplitude-5.2.2-min.gz.js';
+      r.onload = function() {
+        if (!e.amplitude.runQueuedFunctions) {
+          console.log('[Amplitude] Error: could not load SDK');
+        }
+      }
+      ;var i = t.getElementsByTagName('script')[0];
+      i.parentNode.insertBefore(r, i);
+
+      function s(e, t) {
+        e.prototype[t] = function() {
+          this._q.push([t].concat(Array.prototype.slice.call(arguments, 0)));
+          return this;
+        };
+      }
+
+      var o = function() {
+        this._q = [];
+        return this;
+      };
+      var a = [
+        'add',
+        'append',
+        'clearAll',
+        'prepend',
+        'set',
+        'setOnce',
+        'unset']
+      ;
+      for (var u = 0; u < a.length; u++) {
+        s(o, a[u]);
+      }
+      n.Identify = o;
+      var c = function() {
+          this._q = [];
+          return this;
+        }
+      ;var l = [
+        'setProductId',
+        'setQuantity',
+        'setPrice',
+        'setRevenueType',
+        'setEventProperties'];
+      for (var p = 0; p < l.length; p++) {
+        s(c, l[p]);
+      }
+      n.Revenue = c;
+      var d = [
+        'init',
+        'logEvent',
+        'logRevenue',
+        'setUserId',
+        'setUserProperties',
+        'setOptOut',
+        'setVersionName',
+        'setDomain',
+        'setDeviceId',
+        'setGlobalUserProperties',
+        'identify',
+        'clearUserProperties',
+        'setGroup',
+        'logRevenueV2',
+        'regenerateDeviceId',
+        'groupIdentify',
+        'onInit',
+        'logEventWithTimestamp',
+        'logEventWithGroups',
+        'setSessionId',
+        'resetSessionId'];
+
+      function v(e) {
+        function t(t) {
+          e[t] = function() {
+            e._q.push([t].concat(
+              Array.prototype.slice.call(arguments, 0)));
+          };
+        }
+
+        for (var n = 0; n < d.length; n++) {
+          t(d[n]);
+        }
+      }
+
+      v(n);
+      n.getInstance = function(e) {
+        e = (!e || e.length === 0 ? '$default_instance' : e).toLowerCase();
+        if (!n._iq.hasOwnProperty(e)) {
+          n._iq[e] = {_q: []};
+          v(n._iq[e]);
+        }
+        return n._iq[e];
+      };
+      e.amplitude = n;
+    })(window, document);
     // @formatter:on
     /* eslint-enable */
 
@@ -154,17 +262,20 @@ if (__analytics.amplitude?.isEnabled) {
     return {
       name: names.AMPLITUDE,
       trackView(viewName) {
-        window.amplitude.getInstance().logEvent('Page Viewed', { page: viewName });
+        window.amplitude.getInstance()
+          .logEvent('Page Viewed', { page: viewName });
       },
       trackEvent(eventName, properties) {
         const allowProperties = __analytics.amplitude?.allowProperties;
         const disallowProperties = __analytics.amplitude?.disallowProperties;
-        const filteredProperties = filterProperties(allowProperties, disallowProperties, properties);
-        const payload = Object.keys(filteredProperties).reduce((object, key) => (
-          filteredProperties[key]
-            ? { ...object, [key]: filteredProperties[key] }
-            : object
-        ), {});
+        const filteredProperties = filterProperties(allowProperties,
+          disallowProperties, properties);
+        const payload = Object.keys(filteredProperties)
+          .reduce((object, key) => (
+            filteredProperties[key]
+              ? { ...object, [key]: filteredProperties[key] }
+              : object
+          ), {});
 
         window.amplitude.getInstance().logEvent(eventName, payload);
       },
@@ -179,12 +290,17 @@ if (__analytics.amplitude?.isEnabled) {
   if (__analytics.infermedicaAnalytics?.isEnabled) {
     const axios = await import('axios');
     const Bowser = await import('bowser');
-    const { initializeApp } = await import('firebase/app');
-    const { getAuth, signInAnonymously, onAuthStateChanged } = await import('firebase/auth');
+    const {
+      signInAnonymously,
+      onAuthStateChanged,
+    } = await import('firebase/auth');
 
     const infermedicaModule = function () {
-      const baseURL = __analytics.infermedicaAnalytics?.baseURL || 'https://analytics-proxy.infermedica.com/';
-      const { environment, firebaseConfig, firebaseApplicationName } = __analytics.infermedicaAnalytics;
+      const baseURL = __analytics.infermedicaAnalytics?.baseURL
+        || 'https://analytics-proxy.infermedica.com/';
+      const {
+        environment,
+      } = __analytics.infermedicaAnalytics;
       const browser = Bowser.getParser(window.navigator.userAgent);
       const headers = {
         'infer-application-id': __analytics.infermedicaAnalytics?.appId,
@@ -193,13 +309,17 @@ if (__analytics.amplitude?.isEnabled) {
         baseURL,
         headers,
       });
+
+      let auth = null;
+      let eventQueue = [];
       let firebaseUser = null;
+
       const publish = async function (data) {
         const publishURL = '/api/v1/publish';
         const attributes = {
           environment,
         };
-        const { topic, ...properties } = data;
+        const { topic } = data;
         const events = [
           {
             data,
@@ -215,33 +335,42 @@ if (__analytics.amplitude?.isEnabled) {
         await analyticsApi.post(publishURL, payload);
       };
 
-      const applicationName = firebaseApplicationName || defaultApplicationName;
-      const firebaseApp = initializeApp(firebaseConfig, applicationName);
-      const auth = getAuth(firebaseApp);
-
       signInAnonymously(auth);
-      let eventQueue = [];
+
       const getUid = () => (__analytics.infermedicaAnalytics?.sendUID
         ? firebaseUser.uid
         : null);
-      onAuthStateChanged(auth, async (user) => {
-        if (!user) return;
-        firebaseUser = user;
-        eventQueue.forEach((event) => {
-          const { user } = event;
-          publish({
-            ...event,
-            user: {
-              ...user,
-              id: getUid(),
-            },
-          });
-        });
-        eventQueue = [];
-      });
 
       return {
         name: names.INFERMEDICA_ANALYTICS,
+        /**
+         * @param {import('./main').IInitializeParams} options
+         */
+        initialize: async (options) => {
+          auth = options.firebaseAuth;
+
+          onAuthStateChanged(auth, async (authUser) => {
+            if (!authUser) return;
+            firebaseUser = authUser;
+            eventQueue.forEach((event) => {
+              const { user } = event;
+              publish({
+                ...event,
+                user: {
+                  ...user,
+                  id: getUid(),
+                },
+              });
+            });
+            eventQueue = [];
+          });
+
+          if (options.forceSignInAnonymously) await signInAnonymously(auth);
+        },
+        /**
+         * @param {string} eventName
+         * @param { object } properties
+         */
         trackEvent(eventName, properties) {
           // prevent to send event without event_details
           if (!properties.event_details) {
@@ -249,7 +378,8 @@ if (__analytics.amplitude?.isEnabled) {
           }
           const allowProperties = __analytics.infermedicaAnalytics?.allowProperties;
           const disallowProperties = __analytics.infermedicaAnalytics?.disallowProperties;
-          const filteredProperties = filterProperties(allowProperties, disallowProperties, properties);
+          const filteredProperties = filterProperties(allowProperties,
+            disallowProperties, properties);
           const date = new Date();
           const { user, application } = filteredProperties;
           const data = {
