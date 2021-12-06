@@ -40,13 +40,13 @@ export const Analytics = {
    * @param {Array} modules
    */
   async trackEvent(eventName, properties, modules) {
-    for (const analyticModule of analyticModules) {
+    analyticModules.forEach((analyticModule) => {
       if ((modules && !modules.includes(analyticModule.name))
         || !('trackEvent' in analyticModule)) return;
-      await analyticModule.trackEvent(
+      analyticModule.trackEvent(
         eventName, { ...globalProperties, ...properties },
       );
-    }
+    });
   },
 
   /**
@@ -72,7 +72,7 @@ export const Analytics = {
 
 export const VueAnalytics = {
   install: (Vue) => {
-    Vue.$analytics = Analytics;
+    Vue.$analytics = Analytics; // eslint-disable-line no-param-reassign
 
     Object.defineProperties(Vue.prototype, {
       $analytics: {

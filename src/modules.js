@@ -10,7 +10,6 @@ const names = {
   AMPLITUDE: 'amplitude',
   INFERMEDICA_ANALYTICS: 'infermedicaAnalytics',
 };
-const defaultApplicationName = '[DEFAULT]';
 const analyticModules = [];
 const filterProperties = (
   allowProperties = [], disallowProperties = [], properties,
@@ -78,10 +77,10 @@ if (__analytics.googleTagManager?.isEnabled) {
 
     return {
       name: names.GOOGLE_TAG_MANAGE,
-      trackView(viewName) {
+      trackView() {
         window.gtag('event', 'page_view');
       },
-      trackEvent(eventName, properties) {
+      trackEvent(eventName) {
         window.gtag('event', eventName, {
           event_category: 'Event',
         });
@@ -128,7 +127,7 @@ else if (__analytics.googleAnalytics?.isEnabled) {
       trackView(viewName) {
         window.ga('send', 'pageview', viewName || window.location.pathname);
       },
-      trackEvent(eventName, properties) {
+      trackEvent(eventName) {
         window.ga('send', 'event', {
           eventCategory: 'Event',
           eventAction: eventName,
@@ -293,7 +292,9 @@ if (__analytics.amplitude?.isEnabled) {
     const {
       signInAnonymously,
       onAuthStateChanged,
+      getAuth,
     } = await import('firebase/auth');
+    const { initializeApp } = await import('firebase/app');
 
     const infermedicaModule = function () {
       const baseURL = __analytics.infermedicaAnalytics?.baseURL
@@ -335,8 +336,6 @@ if (__analytics.amplitude?.isEnabled) {
         await analyticsApi.post(publishURL, payload);
       };
 
-      signInAnonymously(auth);
-
       const getUid = () => (__analytics.infermedicaAnalytics?.sendUID
         ? firebaseUser.uid
         : null);
@@ -365,10 +364,14 @@ if (__analytics.amplitude?.isEnabled) {
             eventQueue = [];
           });
 
-          if (options.forceSignInAnonymously) await signInAnonymously(auth);
+          if (options.forceSignInAnonymously) {
+            const firebaseApp = initializeApp({});
+            auth = getAuth(firebaseApp);
+            await signInAnonymously(auth);
+          }
         },
         /**
-         * @param {string} eventName
+         * @param { string } eventName
          * @param { object } properties
          */
         async trackEvent(eventName, properties) {
