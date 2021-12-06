@@ -23,12 +23,12 @@ export const Analytics = {
    * @param {string} viewName
    * @param {object} properties
    * @param {Array} modules
-   * @param {boolean} disabled
    */
   trackView(viewName, properties, modules) {
     analyticModules.forEach((analyticModule) => {
-      if (modules && !modules.includes(analyticModule.name)) return;
-      analyticModule.trackView && analyticModule.trackView(
+      if ((modules && !modules.includes(analyticModule.name))
+        || !('trackView' in analyticModule)) return;
+      analyticModule.trackView(
         viewName, { ...globalProperties, ...properties },
       );
     });
@@ -38,24 +38,23 @@ export const Analytics = {
    * @param {string} eventName
    * @param {object} properties
    * @param {Array} modules
-   * @param {boolean} disabled
    */
-  trackEvent(eventName, properties, modules) {
-    analyticModules.forEach((analyticModule) => {
-      if (modules && !modules.includes(analyticModule.name)) return;
-      analyticModule.trackEvent && analyticModule.trackEvent(
+  async trackEvent(eventName, properties, modules) {
+    for (const analyticModule of analyticModules) {
+      if ((modules && !modules.includes(analyticModule.name))
+        || !('trackEvent' in analyticModule)) return;
+      await analyticModule.trackEvent(
         eventName, { ...globalProperties, ...properties },
       );
-    });
+    }
   },
 
   /**
    * @param {string} conversionLabel
    */
   trackConversion(conversionLabel) {
-    analyticModules.forEach((analyticModule) => {
-      analyticModule.trackConversion && analyticModule.trackConversion(conversionLabel);
-    });
+    analyticModules.forEach((analyticModule) => analyticModule.trackConversion
+      && analyticModule.trackConversion(conversionLabel));
   },
 
   /**

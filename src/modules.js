@@ -371,7 +371,7 @@ if (__analytics.amplitude?.isEnabled) {
          * @param {string} eventName
          * @param { object } properties
          */
-        trackEvent(eventName, properties) {
+        async trackEvent(eventName, properties) {
           // prevent to send event without event_details
           if (!properties.event_details) {
             return;
@@ -409,7 +409,7 @@ if (__analytics.amplitude?.isEnabled) {
             eventQueue.push(data);
             return;
           }
-          publish(data);
+          await publish(data);
         },
       };
     };
