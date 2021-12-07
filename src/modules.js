@@ -290,11 +290,8 @@ if (__analytics.amplitude?.isEnabled) {
     const axios = await import('axios');
     const Bowser = await import('bowser');
     const {
-      signInAnonymously,
       onAuthStateChanged,
-      getAuth,
     } = await import('firebase/auth');
-    const { initializeApp } = await import('firebase/app');
 
     const infermedicaModule = function () {
       const baseURL = __analytics.infermedicaAnalytics?.baseURL
@@ -365,6 +362,12 @@ if (__analytics.amplitude?.isEnabled) {
           });
 
           if (options.forceSignInAnonymously) {
+            const {
+              signInAnonymously,
+              getAuth,
+            } = await import('firebase/auth');
+            const { initializeApp } = await import('firebase/app');
+
             const firebaseApp = initializeApp({});
             auth = getAuth(firebaseApp);
             await signInAnonymously(auth);
