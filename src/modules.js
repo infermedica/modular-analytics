@@ -246,18 +246,16 @@ if (__analytics.amplitude?.isEnabled) {
          * @param {import('./main').InitializeParams} options
          */
         initialize: async (options) => {
-          if (options.firebaseAuth) {
+          if ('firebaseAuth' in options && !options.forceSignInAnonymously) {
             auth = options.firebaseAuth;
-          }
-
-          if (options.forceSignInAnonymously) {
+          } else if ('firebaseConfig' in options && options.forceSignInAnonymously) {
             const {
               signInAnonymously,
               getAuth,
             } = await import('firebase/auth');
             const { initializeApp } = await import('firebase/app');
 
-            const firebaseApp = initializeApp({});
+            const firebaseApp = initializeApp(options.firebaseConfig);
             auth = getAuth(firebaseApp);
             await signInAnonymously(auth);
           }
