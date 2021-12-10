@@ -243,7 +243,7 @@ if (__analytics.amplitude?.isEnabled) {
       return {
         name: names.INFERMEDICA_ANALYTICS,
         /**
-         * @param {import('./main').IInitializeParams} options
+         * @param {import('./main').IInitializeParams} [options]
          */
         initialize: async (options) => {
           auth = options.firebaseAuth;

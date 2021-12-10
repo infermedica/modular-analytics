@@ -5,13 +5,12 @@ const globalProperties = {};
 
 export const Analytics = {
   /**
-   * @param {import("./main").IInitializeParams} options
+   * @param {import("./main").IInitializeParams} [options]
    */
   initialize(options) {
     const optionsData = {
       firebaseAuth: null,
-      firebaseAppInstance: null,
-      signInAnonymously: false,
+      forceSignInAnonymously: true,
       ...options,
     };
     analyticModules

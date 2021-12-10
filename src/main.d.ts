@@ -1,5 +1,6 @@
+import { Auth } from '@firebase/auth';
+
 export interface IInitializeParams{
-  firebaseAuth?: any,
-  firebaseAppInstance?: any,
+  firebaseAuth?: Auth,
   forceSignInAnonymously: boolean,
 }
