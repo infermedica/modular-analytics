@@ -133,18 +133,35 @@ Analytics.setGlobalProperties({
 Note that global properties can be overridden by parameters passed to `trackEvent` calls.
 
 ### Initializing `infermedicaAnalytics` module
+#### In order to use `infermedicaAnalytics` module you must initialize it first.
 
-You can decide if you want to use Firebase anonymously or as identified user. In order to use `infermedicaAnalytics` 
-module of this package you should call `initialize()` method and pass it an object which matches the following interface:
+You can decide if you want to use Firebase **anonymously** or as **identified user**. In order to use `infermedicaAnalytics` 
+module of this package you should call `initialize()` method and pass it an object which matches the following type:
 
 ```typescript
-interface IInitializeParams {
-  firebaseAuth?: Auth, // { Auth } from '@firebase/auth';
-  forceSignInAnonymously: boolean, // by default it's set to true
+type InitializeParams = IAnonymousInitializeParams | IAuthenticatedInitializeParams;
+
+interface IAnonymousInitializeParams {
+  firebaseConfig: FirebaseOptions,
+  forceSignInAnonymously: true,
+}
+
+interface IAuthenticatedInitializeParams {
+  firebaseAuth: Auth,
+  forceSignInAnonymously: false,
 }
 ```
 
-In case you need to handle firebase-authentication on your side, do it and then initialize Analytics library by passing the firebaseAuth object as a property of passing object, e.g.:
+If you want to let the library sign you in to firebase as anonymous user, you should call the `initialize()` method with an object corresponding to the `IAnonymousInitializeParams` `interface`, e.g.:
+
+```javascript
+import { Analytics } from '@infermedica/modular-analytics';
+
+const firebaseConfig = { /* your firebase config */ };
+Analytics.initialize({ firebaseConfig, forceSignInAnonymously: true });
+```
+
+In case you need to handle firebase-authentication on your side, do it and then initialize Analytics library by passing object corresponding to the `IAuthenticatedInitializeParams` `interface`, e.g.:
 
 ```javascript
 import { initializeApp } from 'firebase/app';
@@ -157,18 +174,6 @@ const firebaseApp = initializeApp(firebaseConfig);
 const firebaseAuth = getAuth(firebaseApp);
 Analytics.initialize({ firebaseAuth, forceSignInAnonymously: false });
 ```
-
-If you decide to use firebase as anonymous user, you can call the `initialize()` method without passed params or with an object with single property, e.g.:
-
-```javascript
-import { Analytics } from '@infermedica/modular-analytics';
-
-Analytics.initialize();
-// or
-Analytics.initialize({ forceSignInAnonymously: true });
-```
-
-Please do not pass `forceSignInAnonymously: false` without `firebaseAuth` passed along with it, since it may yield some unexpected errors.
 
 ### Usage with Vue.js
 
