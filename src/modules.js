@@ -246,7 +246,21 @@ if (__analytics.amplitude?.isEnabled) {
          * @param {import('./main').IInitializeParams} [options]
          */
         initialize: async (options) => {
-          auth = options.firebaseAuth;
+          if (options.firebaseAuth) {
+            auth = options.firebaseAuth;
+          }
+
+          if (options.forceSignInAnonymously) {
+            const {
+              signInAnonymously,
+              getAuth,
+            } = await import('firebase/auth');
+            const { initializeApp } = await import('firebase/app');
+
+            const firebaseApp = initializeApp({});
+            auth = getAuth(firebaseApp);
+            await signInAnonymously(auth);
+          }
 
           onAuthStateChanged(auth, async (authUser) => {
             if (!authUser) return;
@@ -263,18 +277,6 @@ if (__analytics.amplitude?.isEnabled) {
             });
             eventQueue = [];
           });
-
-          if (options.forceSignInAnonymously) {
-            const {
-              signInAnonymously,
-              getAuth,
-            } = await import('firebase/auth');
-            const { initializeApp } = await import('firebase/app');
-
-            const firebaseApp = initializeApp({});
-            auth = getAuth(firebaseApp);
-            await signInAnonymously(auth);
-          }
         },
         /**
          * @param { string } eventName
