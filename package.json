@@ -33,7 +33,7 @@
   },
   "scripts": {
     "lint": "eslint src/*js --fix",
-    "check": "tsc --noEmit --allowJs --lib dom src/*.js"
+    "check": "tsc --noEmit --moduleResolution node --allowJs --target es6 --lib es2016,dom src/*.js"
   },
   "devDependencies": {
     "eslint": "^7.32.0",
