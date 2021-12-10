@@ -3,6 +3,9 @@ import analyticModules from './modules';
 
 const globalProperties = {};
 
+/**
+ * @type {import('./main').IAnalytics}
+ */
 export const Analytics = {
   /**
    * @param {import("./main").InitializeParams} options
@@ -58,7 +61,7 @@ export const Analytics = {
 
   /**
    * @param {string|object} property
-   * @param {number|undefined} value
+   * @param {Record<string, unknown> | string} value
    */
   setGlobalProperties(property, value) {
     if (typeof property === 'object') {

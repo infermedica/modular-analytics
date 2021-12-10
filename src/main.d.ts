@@ -12,3 +12,11 @@ interface IAuthenticatedInitializeParams {
   firebaseAuth: Auth,
   forceSignInAnonymously: false,
 }
+
+export interface IAnalytics {
+  initialize(params: InitializeParams): void,
+  trackView(viewName: string, properties: Record<string, unknown>, modules?: string[]): void,
+  trackEvent(eventName: string, properties: Record<string, unknown>, modules?: string[]): void,
+  trackConversion(conversionLabel: string): void,
+  setGlobalProperties(property: string, value: Record<string, unknown> | string): void,
+}
