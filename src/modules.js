@@ -229,17 +229,26 @@ if (__analytics.infermedicaAnalytics?.isEnabled) {
       ? firebaseUser.uid
       : null);
 
+    const initializeBrowser = async () => {
+      if (browser === null) {
+        const Bowser = await import('bowser');
+        browser = Bowser.getParser(window.navigator.userAgent);
+      }
+      return Promise.resolve(browser);
+    };
+
     return {
       name: names.INFERMEDICA_ANALYTICS,
       /**
        * @param {import('./main').InitializeParams} options
        */
       initialize: async (options) => {
-        const Bowser = await import('bowser');
-        const axios = await import('axios');
-        const { onAuthStateChanged } = await import('firebase/auth');
+        const [axios, { onAuthStateChanged }] = await Promise.all([
+          import('axios'),
+          import('firebase/auth'),
+          initializeBrowser(),
+        ]);
 
-        browser = Bowser.getParser(window.navigator.userAgent);
         analyticsApi = axios.create({
           baseURL,
           headers,
@@ -249,11 +258,7 @@ if (__analytics.infermedicaAnalytics?.isEnabled) {
           auth = options.firebaseAuth;
         } else if ('firebaseConfig' in options
           && options.forceSignInAnonymously) {
-          const {
-            signInAnonymously,
-            getAuth,
-          } = await import('firebase/auth');
-          const { initializeApp } = await import('firebase/app');
+          const [{ signInAnonymously, getAuth }, { initializeApp }] = await Promise.all([import('firebase/auth'), import('firebase/app')]);
 
           const firebaseApp = initializeApp(options.firebaseConfig);
           auth = getAuth(firebaseApp);
@@ -285,6 +290,7 @@ if (__analytics.infermedicaAnalytics?.isEnabled) {
         if (!properties.event_details) {
           return;
         }
+        await initializeBrowser();
         const allowProperties = __analytics.infermedicaAnalytics?.allowProperties;
         const disallowProperties = __analytics.infermedicaAnalytics?.disallowProperties;
         const filteredProperties = filterProperties(allowProperties,
