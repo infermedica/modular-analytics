@@ -5,6 +5,7 @@
   "author": "Infermedica",
   "license": "MIT",
   "main": "src/index.js",
+  "types": "src/main.d.ts",
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/infermedica/modular-analytics"
