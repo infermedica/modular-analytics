@@ -15,36 +15,37 @@ The analytics interfaces has to be configured in Webpack configuration file thro
 
 ```javascript
 new webpack.DefinePlugin({
-  __analytics: JSON.stringify({
+  __analytics: {
     debug: {
       isEnabled: true
     },
     googleAnalytics: {
       isEnabled: true,
-      key: '<your-key>'
+      key: JSON.stringify('<your-key>')
     },
     googleAdWords: {
       isEnabled: true,
-      key: '<your-key>'
+      key: JSON.stringify('<your-key>')
     },
     googleTagManager: {
       isEnabled: true
     },
     amplitude: {
       isEnabled: true,
-      key: '<your-key>',
-      allowProprties: [], // optional
-      disallowProperties: ['application', 'user', 'section', 'event_details'], // optional
+      key: JSON.stringify('<your-key>'),
+      allowProprties: JSON.stringify([]), // optional
+      disallowProperties: JSON.stringify(['application', 'user', 'section', 'event_details']), // optional
     },
     infermedicaAnalytics: {
       isEnabled: true,
-      topic: '<your-topic>',
-      environment: process.env.NODE_ENV,
+      useFirebase: true,
+      topic: JSON.stringify('<your-topic>'),
+      environment: JSON.stringify('<your-environment>'),
       sendUID: false, // allow to send firebase UID, false by default 
-      allowProperties: ['application', 'user', 'section', 'event_details'], // optional
-      disallowProperties: [], // optional
+      allowProperties: JSON.stringify(['application', 'user', 'section', 'event_details']), // optional
+      disallowProperties: JSON.stringify([]), // optional
     },
-  })
+  }
 })
 ```
 
