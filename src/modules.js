@@ -288,8 +288,9 @@ if (__analytics.infermedicaAnalytics.isEnabled) {
               });
               eventQueue = [];
             });
+            return Promise.resolve();
           };
-          initializeFirebase();
+          await initializeFirebase();
         }
       },
       /**
