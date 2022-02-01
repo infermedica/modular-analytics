@@ -229,7 +229,7 @@ if (__analytics.infermedicaAnalytics.isEnabled) {
     };
 
     const getUid = () => (useFirebase && __analytics.infermedicaAnalytics?.sendUID
-      ? firebaseUser.uid
+      ? firebaseUser?.uid
       : null);
 
     const initializeBrowser = async () => {
@@ -288,9 +288,8 @@ if (__analytics.infermedicaAnalytics.isEnabled) {
               });
               eventQueue = [];
             });
-            return Promise.resolve();
           };
-          await initializeFirebase();
+          initializeFirebase();
         }
       },
       /**
