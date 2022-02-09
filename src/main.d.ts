@@ -14,7 +14,7 @@ interface IAuthenticatedInitializeParams {
 }
 
 export interface IAnalytics {
-  initialize(params: InitializeParams): void,
+  initialize(params: InitializeParams): Promise<void>,
   trackView(viewName: string, properties: Record<string, unknown>, modules?: string[]): void,
   trackEvent(eventName: string, properties: Record<string, unknown>, modules?: string[]): void,
   trackConversion(conversionLabel: string): void,
