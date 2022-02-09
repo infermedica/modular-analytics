@@ -246,7 +246,9 @@ if (__analytics.infermedicaAnalytics.isEnabled) {
        * @param {import('./main').InitializeParams} options
        */
       initialize: async (options) => {
-        const { forceSignInAnonymously, firebaseAuth, firebaseConfig } = options;
+        const {
+          forceSignInAnonymously, firebaseAuth, firebaseConfig, firebaseAppName,
+        } = options;
         const [axios] = await Promise.all([
           import('axios'),
           initializeBrowser(),
@@ -268,7 +270,7 @@ if (__analytics.infermedicaAnalytics.isEnabled) {
                 import('firebase/auth'),
                 import('firebase/app'),
               ]);
-              const firebaseApp = initializeApp(firebaseConfig);
+              const firebaseApp = initializeApp(firebaseConfig, firebaseAppName);
               auth = getAuth(firebaseApp);
               await signInAnonymously(auth);
             }

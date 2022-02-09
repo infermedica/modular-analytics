@@ -6,11 +6,13 @@ export type InitializeParams = IAnonymousInitializeParams | IAuthenticatedInitia
 interface IAnonymousInitializeParams {
   firebaseConfig: FirebaseOptions,
   forceSignInAnonymously: true,
+  firebaseAppName?: string,
 }
 
 interface IAuthenticatedInitializeParams {
   firebaseAuth: Auth,
   forceSignInAnonymously: false,
+  firebaseAppName?: string,
 }
 
 export interface IAnalytics {
