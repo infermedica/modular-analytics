@@ -109,7 +109,7 @@ To track events, use:
 Analytics.trackConversion('conversion-label');
 ```
 
-The "conversion-label" will be passed to gtag function as follow:
+The "conversion-label" will be passed to gtag function as follows:
 ```
 window.gtag('event', 'conversion', {send_to: __analytics.googleAdWords.key + '/' + conversionLabel});
 ```
@@ -136,8 +136,10 @@ Note that global properties can be overridden by parameters passed to `trackEven
 ### Initializing `infermedicaAnalytics` module
 #### In order to use `infermedicaAnalytics` module you must initialize it first.
 
-You can decide if you want to use Firebase **anonymously** or as **identified user**. In order to use `infermedicaAnalytics` 
-module of this package you should call `initialize()` method and pass it an object which matches the following type:
+You can decide whether to use Firebase or not:
+
+- While choosing the first scenario you can decide if you want to use Firebase **anonymously** or as **identified user**. 
+In order to use `infermedicaAnalytics` module of this package along with Firebase you should call `initialize()` method and pass it an object which matches the following type:
 
 ```typescript
 type InitializeParams = IAnonymousInitializeParams | IAuthenticatedInitializeParams;
@@ -155,7 +157,7 @@ interface IAuthenticatedInitializeParams {
 }
 ```
 
-If you want to let the library sign you in to firebase as anonymous user, you should call the `initialize()` method with an object corresponding to the `IAnonymousInitializeParams` `interface`, e.g.:
+- If you want to let the library sign you in to firebase as anonymous user, you should call the `initialize()` method with an object corresponding to the `IAnonymousInitializeParams` `interface`, e.g.:
 
 ```javascript
 import { Analytics } from '@infermedica/modular-analytics';
@@ -164,7 +166,7 @@ const firebaseConfig = { /* your firebase config */ };
 Analytics.initialize({ firebaseConfig, forceSignInAnonymously: true, firebaseAppName: 'MY_APP' });
 ```
 
-In case you need to handle firebase-authentication on your side, do it and then initialize Analytics library by passing object corresponding to the `IAuthenticatedInitializeParams` `interface`, e.g.:
+- In case you need to handle firebase-authentication on your side, do it and then initialize Analytics library by passing object corresponding to the `IAuthenticatedInitializeParams` `interface`, e.g.:
 
 ```javascript
 import { initializeApp } from 'firebase/app';
@@ -177,6 +179,9 @@ const firebaseApp = initializeApp(firebaseConfig);
 const firebaseAuth = getAuth(firebaseApp);
 Analytics.initialize({ firebaseAuth, forceSignInAnonymously: false, firebaseAppName: 'MY_APP' });
 ```
+
+- On the other hand, if you decide not to use **Firebase** at all, you don't have to call `Analytics.initialize()` since all it does is initialize Firebase-related stuff. In this case you have to remember to set `useFirebase` flag to `false` during webpack-configuration of the library.
+
 
 ### Usage with Vue.js
 

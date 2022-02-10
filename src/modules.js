@@ -240,28 +240,35 @@ if (__analytics.infermedicaAnalytics.isEnabled) {
       return Promise.resolve(browser);
     };
 
-    return {
-      name: names.INFERMEDICA_ANALYTICS,
-      /**
-       * @param {import('./main').InitializeParams} options
-       */
-      initialize: async (options) => {
-        const {
-          forceSignInAnonymously, firebaseAuth, firebaseConfig, firebaseAppName,
-        } = options;
-        const [axios] = await Promise.all([
-          import('axios'),
-          initializeBrowser(),
-        ]);
+    const initializeAxios = async () => {
+      if (analyticsApi === null) {
+        const axios = await import('axios');
 
         analyticsApi = axios.create({
           baseURL,
           headers,
         });
+      }
+    };
+
+    return {
+      name: names.INFERMEDICA_ANALYTICS,
+      /**
+       * @param {import('./main').InitializeParams} options
+       */
+      initialize: async (options = {}) => {
+        await Promise.all([initializeAxios(), initializeBrowser()]);
 
         // Use directly from __analytics to support tree shaking
         if (__analytics.infermedicaAnalytics.useFirebase) {
           const initializeFirebase = async () => {
+            const {
+              forceSignInAnonymously,
+              firebaseAuth,
+              firebaseConfig,
+              firebaseAppName,
+            } = options;
+
             const { onAuthStateChanged } = await import('firebase/auth');
             if (firebaseAuth && !forceSignInAnonymously) {
               auth = firebaseAuth;
@@ -303,7 +310,7 @@ if (__analytics.infermedicaAnalytics.isEnabled) {
         if (!properties.event_details) {
           return;
         }
-        await initializeBrowser();
+        await Promise.all([initializeAxios(), initializeBrowser()]);
         const allowProperties = __analytics.infermedicaAnalytics?.allowProperties;
         const disallowProperties = __analytics.infermedicaAnalytics?.disallowProperties;
         const filteredProperties = filterProperties(allowProperties,

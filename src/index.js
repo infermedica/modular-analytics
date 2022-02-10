@@ -11,14 +11,9 @@ export const Analytics = {
    * @param {import("./main").InitializeParams} options
    */
   async initialize(options) {
-    const optionsData = {
-      firebaseAuth: null,
-      forceSignInAnonymously: false,
-      ...options,
-    };
     await Promise.all(analyticModules
       .map(async (analyticModule) => analyticModule.initialize
-      && analyticModule.initialize(optionsData)));
+      && analyticModule.initialize(options)));
   },
 
   /**
