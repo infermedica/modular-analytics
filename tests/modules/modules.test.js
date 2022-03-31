@@ -14,38 +14,30 @@ describe('modules', () => {
     __analytics.googleTagManager.isEnabled = false;
     __analytics.googleAnalytics.isEnabled = true;
     analyticModules = await import('../../src/modules');
-    const googleTagManager = analyticModules.default.find(moduleName => {
-      return moduleName.name === 'googleTagManager'
-    })
-    const googleAnalytics = analyticModules.default.find(moduleName => {
-      return moduleName.name === 'googleAnalytics'
-    })
-    expect(googleTagManager).toBeFalsy()
-    expect(googleAnalytics).toBeTruthy()
+    const googleTagManager = analyticModules.default.find((moduleName) => moduleName.name === 'googleTagManager');
+    const googleAnalytics = analyticModules.default.find((moduleName) => moduleName.name === 'googleAnalytics');
+    expect(googleTagManager).toBeFalsy();
+    expect(googleAnalytics).toBeTruthy();
   });
   test('without returning googleAnalytics after enabling googleTagManager', async () => {
     __analytics.googleTagManager.isEnabled = true;
     __analytics.googleAnalytics.isEnabled = true;
     analyticModules = await import('../../src/modules');
-    const googleTagManager = analyticModules.default.find(moduleName => {
-      return moduleName.name === 'googleTagManager'
-    })
-    const googleAnalytics = analyticModules.default.find(moduleName => {
-      return moduleName.name === 'googleAnalytics'
-    })
-    expect(googleTagManager).toBeTruthy()
-    expect(googleAnalytics).toBeFalsy()
+    const googleTagManager = analyticModules.default.find((moduleName) => moduleName.name === 'googleTagManager');
+    const googleAnalytics = analyticModules.default.find((moduleName) => moduleName.name === 'googleAnalytics');
+    expect(googleTagManager).toBeTruthy();
+    expect(googleAnalytics).toBeFalsy();
   });
   test('return only enabled modules', async () => {
     __analytics.debug.isEnabled = true;
-    __analytics.googleAnalytics.isEnabled = true,
+    __analytics.googleAnalytics.isEnabled = true;
     analyticModules = await import('../../src/modules');
     expect(analyticModules.default.length).toBe(2);
   });
   test('return four modules when all are enabled', async () => {
-    for(let moduleName in __analytics){
-      __analytics[moduleName].isEnabled = true;
-    }
+    Object.keys(__analytics).forEach((singleModule) => {
+      __analytics[singleModule].isEnabled = true;
+    });
     analyticModules = await import('../../src/modules');
     expect(analyticModules.default.length).toBe(4);
   });
