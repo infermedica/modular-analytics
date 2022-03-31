@@ -9,7 +9,7 @@ beforeEach(() => {
 });
 
 describe('module/googleAnalytics', () => {
-  test('googleAnalytics is disabled', async () => {
+  test('return [] when googleAnalytics is disabled', async () => {
     __analytics.googleAnalytics.isEnabled = false;
     analyticModules = await import('../../src/modules');
     expect(analyticModules).toEqual({ default: [] });

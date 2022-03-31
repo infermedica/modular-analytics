@@ -6,7 +6,7 @@ beforeEach(() => {
 });
 
 describe('module/dubug', () => {
-  test('debug is disabled', async () => {
+  test('return [] when debug is disabled', async () => {
     analyticModules = await import('../../src/modules');
     expect(analyticModules).toEqual({ default: [] });
   });
@@ -27,7 +27,7 @@ describe('module/dubug', () => {
     __analytics.debug.isEnabled = true;
     analyticModules = await import('../../src/modules');
     const { trackEvent } = analyticModules.default[0];
-    trackEvent('eventName', 'properties');
-    expect(logSpy).toHaveBeenCalledWith('Analytics (trackEvent):', 'eventName', 'properties');
+    trackEvent('eventName', { test: 'test' });
+    expect(logSpy).toHaveBeenCalledWith('Analytics (trackEvent):', 'eventName', { test: 'test' });
   });
 });

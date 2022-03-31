@@ -44,8 +44,8 @@ beforeEach(() => {
   jest.resetModules();
 });
 
-describe('module/googleTagManager', () => {
-  test('googleTagManager is disabled', async () => {
+describe('module/infermedicaAnalytics', () => {
+  test('return [] when infermedicaAnalytics is disabled', async () => {
     __analytics.infermedicaAnalytics.isEnabled = false;
     analyticModules = await import('../../src/modules');
     expect(analyticModules).toEqual({ default: [] });

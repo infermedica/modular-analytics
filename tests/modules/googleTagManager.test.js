@@ -8,7 +8,7 @@ beforeEach(() => {
 });
 
 describe('module/googleTagManager', () => {
-  test('googleTagManager is disabled', async () => {
+  test('return [] when googleTagManager is disabled', async () => {
     __analytics.googleTagManager.isEnabled = false;
     analyticModules = await import('../../src/modules');
     expect(analyticModules).toEqual({ default: [] });
@@ -32,7 +32,7 @@ describe('module/googleTagManager', () => {
     trackEvent(testString);
     expect(window.gtag).toHaveBeenCalledWith('event', testString, { event_category: 'Event' });
   });
-  test('return correct track conversion with disabled google ad words', async () => {
+  test('return correct track conversion with disabled googleAdWords', async () => {
     __analytics.googleAdWords.isEnabled = false;
     analyticModules = await import('../../src/modules');
     const { trackConversion } = analyticModules.default[0];
@@ -40,7 +40,7 @@ describe('module/googleTagManager', () => {
     trackConversion();
     expect(window.gtag).not.toHaveBeenCalled();
   });
-  test('return correct track conversion with enabled google ad words', async () => {
+  test('return correct track conversion with enabled googleAdWords', async () => {
     __analytics.googleAdWords.isEnabled = true;
     analyticModules = await import('../../src/modules');
     const { trackConversion } = analyticModules.default[0];
