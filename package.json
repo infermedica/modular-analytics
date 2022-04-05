@@ -1,7 +1,7 @@
 {
   "name": "@infermedica/modular-analytics",
   "description": "Modular analytics interface",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "author": "Infermedica",
   "license": "MIT",
   "main": "src/index.js",
@@ -56,7 +56,7 @@
     "@types/node": "^16.11.11",
     "axios": "^0.24.0",
     "bowser": "^2.11.0",
-    "firebase": "^9.5.0",
+    "firebase": "^9.6.8",
     "typescript": "^4.5.2"
   }
 }
