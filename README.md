@@ -219,6 +219,18 @@ Currently the following providers are supported:
 
 Other analytics tools are easy to integrate with this module and we might add their support in the future.
 
+## Unit Test
+We use the [jest](https://jestjs.io/) library for our tests.
+### Running from the command line
+Run all tests
+```bash
+$ npm run test 
+```
+Run only the tests that were specified with a filename
+```bash
+$ npm run test file-name.test.js
+```
+
 ## Contribution
 
 We're happy to accept pull requests with additional integrations. Feel free to raise an issue if you have any
