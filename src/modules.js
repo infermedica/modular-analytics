@@ -234,7 +234,7 @@ if (__analytics.infermedicaAnalytics.isEnabled) {
 
     const initializeBrowser = async () => {
       if (browser === null) {
-        const Bowser = await import('bowser');
+        const { default: Bowser } = await import('bowser');
         browser = Bowser.getParser(window.navigator.userAgent);
       }
       return Promise.resolve(browser);
@@ -242,7 +242,7 @@ if (__analytics.infermedicaAnalytics.isEnabled) {
 
     const initializeAxios = async () => {
       if (analyticsApi === null) {
-        const axios = await import('axios');
+        const { default: axios } = await import('axios');
 
         analyticsApi = axios.create({
           baseURL,
