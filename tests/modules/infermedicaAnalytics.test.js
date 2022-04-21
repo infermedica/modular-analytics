@@ -6,7 +6,7 @@ let publishPayload;
 const testProperties = { test: 'test', test2: 'test2', test3: 'test3' };
 const expectedPayload = {
   events: [{
-    attributes: { environment: undefined },
+    attributes: { environment: 'test' },
     data: {
       application: {},
       date: new Date(),
@@ -36,11 +36,15 @@ jest.mock('axios', () => ({
 }));
 
 beforeEach(() => {
+  __analytics.infermedicaAnalytics.allowProperties = ['test', 'test2', 'test3'];
+  __analytics.infermedicaAnalytics.environment = 'test';
   __analytics.infermedicaAnalytics.isEnabled = true;
   __analytics.infermedicaAnalytics.topic = 'test';
   delete expectedPayload.events[0].data.test;
   delete expectedPayload.events[0].data.test2;
   delete expectedPayload.events[0].data.test3;
+  expectedPayload.topic = 'test';
+  expectedPayload.events[0].attributes.environment = 'test';
   jest.resetModules();
 });
 
@@ -49,11 +53,6 @@ describe('module/infermedicaAnalytics', () => {
     __analytics.infermedicaAnalytics.isEnabled = false;
     analyticModules = await import('../../src/modules');
     expect(analyticModules).toEqual({ default: [] });
-  });
-  test('return correct name', async () => {
-    analyticModules = await import('../../src/modules');
-    const { name } = analyticModules.default[0];
-    expect(name).toBe('infermedicaAnalytics');
   });
   test('track event, correct publish payload', async () => {
     expectedPayload.events[0].data = {
@@ -84,6 +83,30 @@ describe('module/infermedicaAnalytics', () => {
       test: 'test',
       test2: 'test2',
     };
+    analyticModules = await import('../../src/modules');
+    const { trackEvent } = analyticModules.default[0];
+    await trackEvent('eventName', { event_details: {}, ...testProperties });
+    expect(publishPayload).toEqual(expectedPayload);
+  });
+  test('track event, with custom environment', async () => {
+    __analytics.infermedicaAnalytics.environment = 'custom environment';
+    expectedPayload.events[0].data = {
+      ...expectedPayload.events[0].data,
+      ...testProperties,
+    };
+    expectedPayload.events[0].attributes.environment = 'custom environment';
+    analyticModules = await import('../../src/modules');
+    const { trackEvent } = analyticModules.default[0];
+    await trackEvent('eventName', { event_details: {}, ...testProperties });
+    expect(publishPayload).toEqual(expectedPayload);
+  });
+  test('track event, with custom topic', async () => {
+    __analytics.infermedicaAnalytics.topic = 'custom topic';
+    expectedPayload.events[0].data = {
+      ...expectedPayload.events[0].data,
+      ...testProperties,
+    };
+    expectedPayload.topic = 'custom topic';
     analyticModules = await import('../../src/modules');
     const { trackEvent } = analyticModules.default[0];
     await trackEvent('eventName', { event_details: {}, ...testProperties });

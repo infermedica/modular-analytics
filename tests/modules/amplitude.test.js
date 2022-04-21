@@ -14,11 +14,6 @@ describe('module/amplitude', () => {
     analyticModules = await import('../../src/modules');
     expect(analyticModules).toEqual({ default: [] });
   });
-  test('return correct name', async () => {
-    analyticModules = await import('../../src/modules');
-    const { name } = analyticModules.default[0];
-    expect(name).toBe('amplitude');
-  });
   test('return correct track view', async () => {
     analyticModules = await import('../../src/modules');
     const { trackView } = analyticModules.default[0];

@@ -14,11 +14,6 @@ describe('module/googleAnalytics', () => {
     analyticModules = await import('../../src/modules');
     expect(analyticModules).toEqual({ default: [] });
   });
-  test('return corrent name', async () => {
-    analyticModules = await import('../../src/modules');
-    const { name } = analyticModules.default[0];
-    expect(name).toBe('googleAnalytics');
-  });
   test('return correct track view with parametr', async () => {
     analyticModules = await import('../../src/modules');
     const { trackView } = analyticModules.default[0];

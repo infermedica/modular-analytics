@@ -10,12 +10,6 @@ describe('module/dubug', () => {
     analyticModules = await import('../../src/modules');
     expect(analyticModules).toEqual({ default: [] });
   });
-  test('return correct name', async () => {
-    __analytics.debug.isEnabled = true;
-    analyticModules = await import('../../src/modules');
-    const { name } = analyticModules.default[0];
-    expect(name).toBe('debug');
-  });
   test('return correct track view', async () => {
     __analytics.debug.isEnabled = true;
     analyticModules = await import('../../src/modules');
