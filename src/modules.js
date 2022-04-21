@@ -24,6 +24,7 @@ const filterProperties = (
   .reduce((object, key) => ({ ...object, [key]: properties[key] }), {});
 
 // --- Debug module ---
+/* eslint-disable no-console */
 if (__analytics.debug.isEnabled) {
   const debugModule = function () {
     console.log('Analytics (initialization)');
@@ -41,6 +42,7 @@ if (__analytics.debug.isEnabled) {
 
   analyticModules.push(debugModule());
 }
+/* eslint-enable */
 
 // --- Google Tag Manager ---
 if (__analytics.googleTagManager.isEnabled) {

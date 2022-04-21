@@ -34,11 +34,11 @@
       "sourceType": "module"
     },
     "rules": {
-      "no-param-reassign": 0
+      "max-len": ["error", { "code": 120 }]
     }
   },
   "scripts": {
-    "lint": "eslint src/*js --fix",
+    "lint": "eslint \"**/*.js\" --fix",
     "check": "tsc --noEmit --moduleResolution node --allowJs --target es6 --lib es2016,dom src/*.js",
     "test": "jest"
   },
