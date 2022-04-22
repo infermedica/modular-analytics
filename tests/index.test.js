@@ -280,11 +280,4 @@ describe('analytics function', () => {
       expect(globalProperties).toEqual(testObj);
     });
   });
-  describe('Vue Analytics', () => {
-    test('use as Plugin in Vue 2', () => {
-      const vueInstance = { prototype: {} };
-      analytics.VueAnalytics.install(vueInstance);
-      expect(vueInstance.prototype.$analytics).toEqual(analytics.Analytics);
-    });
-  });
 });
