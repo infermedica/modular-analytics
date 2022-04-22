@@ -24,6 +24,7 @@ const filterProperties = (
   .reduce((object, key) => ({ ...object, [key]: properties[key] }), {});
 
 // --- Debug module ---
+/* eslint-disable no-console */
 if (__analytics.debug.isEnabled) {
   const debugModule = function () {
     console.log('Analytics (initialization)');
@@ -41,6 +42,7 @@ if (__analytics.debug.isEnabled) {
 
   analyticModules.push(debugModule());
 }
+/* eslint-enable */
 
 // --- Google Tag Manager ---
 if (__analytics.googleTagManager.isEnabled) {
@@ -234,7 +236,7 @@ if (__analytics.infermedicaAnalytics.isEnabled) {
 
     const initializeBrowser = async () => {
       if (browser === null) {
-        const Bowser = await import('bowser');
+        const { default: Bowser } = await import('bowser');
         browser = Bowser.getParser(window.navigator.userAgent);
       }
       return Promise.resolve(browser);
@@ -242,7 +244,7 @@ if (__analytics.infermedicaAnalytics.isEnabled) {
 
     const initializeAxios = async () => {
       if (analyticsApi === null) {
-        const axios = await import('axios');
+        const { default: axios } = await import('axios');
 
         analyticsApi = axios.create({
           baseURL,
