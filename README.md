@@ -182,13 +182,40 @@ Analytics.initialize({ firebaseAuth, forceSignInAnonymously: false, firebaseAppN
 
 - On the other hand, if you decide not to use **Firebase** at all, you don't have to call `Analytics.initialize()` since all it does is initialize Firebase-related stuff. In this case you have to remember to set `useFirebase` flag to `false` during webpack-configuration of the library.
 
+### Usage with Vue.js 3.x
 
-### Usage with Vue.js
-
-This package can be used as a Vue.js plugin:
+This package cna be used ad Vue.js 3 plugin:
 
 ```javascript
-import {VueAnalytics} from '@infermedica/modular-analytics';
+import VueAnalytics from '@infermedica/modular-analytics/vue';
+
+app.use(VueAnalytics);
+```
+
+You can access it as a global variable in template:
+
+```vue
+<template>
+  <button @click="$analytics.trackEvent(...)">trackEvent</button>
+</template>
+```
+To use it in script use `useAnalytics` composable:
+
+```vue
+<script setup>
+import VueAnalytics from '@infermedica/modular-analytics/vue';
+const Analytics = useAnalytics();
+
+Analytics.trackEvent();
+</script>
+```
+
+### Usage with Vue.js 2.x
+
+This package can be used as a Vue.js 2 plugin:
+
+```javascript
+import VueAnalytics from '@infermedica/modular-analytics/vue';
 
 Vue.use(VueAnalytics);
 ```

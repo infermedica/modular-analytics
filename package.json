@@ -5,6 +5,10 @@
   "author": "Infermedica",
   "license": "MIT",
   "main": "src/index.js",
+  "imports": {
+    ".": "src/index.js",
+    "./vue": "src/vue.js"
+  },
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/infermedica/modular-analytics"
