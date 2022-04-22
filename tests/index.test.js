@@ -1,4 +1,10 @@
+/* eslint-disable no-underscore-dangle */
 /* global __analytics */
+document.body.innerHTML = '<script></script>';
+Object.keys(__analytics).forEach((module) => {
+  __analytics[module].isEnabled = true;
+});
+
 let analytics;
 let analyticModules;
 let mockedAnalyticModules;
@@ -6,28 +12,22 @@ let modulesSchema;
 const testStr = 'test';
 const testObj = { test: 'test' };
 const moduleNames = ['mock0', 'mock1', 'mock2'];
-const supportedModuleNames = ['mock0', 'mock2'];
-const trackViewModule = { support: ['trackView'] };
-const trackEventModule = { support: ['trackEvent'] };
+const supportedModuleNames = ['mock0', 'mock1'];
+const initializeModule = { support: ['initialize'] };
 const trackConversionModule = { support: ['trackConversion'] };
-const initializeModule = { support: 'initialize' };
-
-document.body.innerHTML = '<script></script>';
-Object.keys(__analytics).forEach((singleModule) => {
-  __analytics[singleModule].isEnabled = true;
-});
-
+const trackEventModule = { support: ['trackEvent'] };
+const trackViewModule = { support: ['trackView'] };
 const createMyModule = (support, name = 'mock') => {
   const template = {
     name,
     trackView: jest.fn(),
     trackEvent: jest.fn(),
     trackConversion: jest.fn(),
-    initialize: () => new Promise((resolve) => {
+    initialize: jest.fn(() => new Promise((resolve) => {
       setTimeout(() => {
         resolve(testObj);
       }, 300);
-    }),
+    })),
   };
   return Object.keys(template).reduce((module, method) => {
     if (support.includes(method) || method === 'name') {
@@ -52,8 +52,7 @@ const setAnalyticModulesMock = async (moduleRules) => {
   jest.doMock('../src/modules', () => ({ __esModule: true, default: createModuleList(moduleRules) }));
   analyticModules = await import('../src/modules');
   analytics = await import('../src/index');
-  // eslint-disable-next-line prefer-destructuring
-  mockedAnalyticModules = analyticModules.default;
+  ({ default: mockedAnalyticModules } = analyticModules);
 };
 
 describe('analytics function', () => {
@@ -69,12 +68,12 @@ describe('analytics function', () => {
       analytics.Analytics.trackEvent(testStr, testObj, 'notThisModuleName');
       expect(mockedAnalyticModules[0].trackEvent).not.toHaveBeenCalledWith(testStr, testObj);
     });
-    test('run trackEvent in module with global properties as string', async () => {
+    test('run trackEvent in module with global properties, setGlobalProperties parameter as string', async () => {
       analytics.Analytics.setGlobalProperties('global', 'asString');
       analytics.Analytics.trackEvent(testStr, testObj, moduleNames);
       expect(mockedAnalyticModules[0].trackEvent).toHaveBeenCalledWith(testStr, { global: 'asString', ...testObj });
     });
-    test('run trackEvent in module with global properties as object', async () => {
+    test('run trackEvent in module with global properties, setGlobalProperties parameter as object', async () => {
       analytics.Analytics.setGlobalProperties({ global: 'asObject' });
       analytics.Analytics.trackEvent(testStr, testObj, moduleNames);
       expect(mockedAnalyticModules[0].trackEvent).toHaveBeenCalledWith(testStr, { global: 'asObject', ...testObj });
@@ -92,9 +91,9 @@ describe('analytics function', () => {
       modulesSchema = [trackEventModule, trackEventModule, trackEventModule];
       await setAnalyticModulesMock(modulesSchema);
       analytics.Analytics.trackEvent(testStr, testObj, moduleNames);
-      expect(mockedAnalyticModules[0].trackEvent).toHaveBeenCalledWith(testStr, testObj);
-      expect(mockedAnalyticModules[1].trackEvent).toHaveBeenCalledWith(testStr, testObj);
-      expect(mockedAnalyticModules[2].trackEvent).toHaveBeenCalledWith(testStr, testObj);
+      modulesSchema.forEach((module, i) => {
+        expect(mockedAnalyticModules[i].trackEvent).toHaveBeenCalledWith(testStr, testObj);
+      });
     });
     test('not throw error when all modules does not support trackEvent', async () => {
       modulesSchema = [trackViewModule, trackConversionModule, initializeModule];
@@ -105,11 +104,11 @@ describe('analytics function', () => {
       modulesSchema = [trackEventModule, trackEventModule, trackEventModule];
       await setAnalyticModulesMock(modulesSchema);
       analytics.Analytics.trackEvent(testStr, testObj, supportedModuleNames);
-      expect(mockedAnalyticModules[0].trackEvent).toHaveBeenCalledWith(testStr, testObj);
-      expect(mockedAnalyticModules[1].trackEvent).not.toHaveBeenCalledWith(testStr, testObj);
-      expect(mockedAnalyticModules[2].trackEvent).toHaveBeenCalledWith(testStr, testObj);
+      supportedModuleNames.forEach((moduleName, i) => {
+        expect(mockedAnalyticModules[i].trackEvent).toHaveBeenCalledWith(testStr, testObj);
+      });
+      expect(mockedAnalyticModules[2].trackEvent).not.toHaveBeenCalledWith(testStr, testObj);
     });
-
     test('trackEvent is not called before response of initialize function', async (done) => {
       modulesSchema = [{ support: ['trackEvent', 'initialize'] }];
       await setAnalyticModulesMock(modulesSchema);
@@ -147,12 +146,12 @@ describe('analytics function', () => {
       analytics.Analytics.trackView(testStr, testObj, 'notThisModuleName');
       expect(mockedAnalyticModules[0].trackView).not.toHaveBeenCalledWith(testStr, testObj);
     });
-    test('run trackView with global properties as string', async () => {
+    test('run trackView with global properties, setGlobalProperties parameter as string', async () => {
       analytics.Analytics.setGlobalProperties('global', 'asString');
       analytics.Analytics.trackView(testStr, testObj, moduleNames);
       expect(mockedAnalyticModules[0].trackView).toHaveBeenCalledWith(testStr, { global: 'asString', ...testObj });
     });
-    test('run trackView with global properties as object', async () => {
+    test('run trackView with global properties, setGlobalProperties parameter as object', async () => {
       analytics.Analytics.setGlobalProperties({ global: 'asObject' });
       analytics.Analytics.trackView(testStr, testObj, moduleNames);
       expect(mockedAnalyticModules[0].trackView).toHaveBeenCalledWith(testStr, { global: 'asObject', ...testObj });
@@ -170,9 +169,9 @@ describe('analytics function', () => {
       modulesSchema = [trackViewModule, trackViewModule, trackViewModule];
       await setAnalyticModulesMock(modulesSchema);
       analytics.Analytics.trackView(testStr, testObj, moduleNames);
-      expect(mockedAnalyticModules[0].trackView).toHaveBeenCalledWith(testStr, testObj);
-      expect(mockedAnalyticModules[1].trackView).toHaveBeenCalledWith(testStr, testObj);
-      expect(mockedAnalyticModules[2].trackView).toHaveBeenCalledWith(testStr, testObj);
+      modulesSchema.forEach((module, i) => {
+        expect(mockedAnalyticModules[i].trackView).toHaveBeenCalledWith(testStr, testObj);
+      });
     });
     test('not throw error when all modules does not support trackView', async () => {
       modulesSchema = [trackEventModule, trackConversionModule, initializeModule];
@@ -183,21 +182,20 @@ describe('analytics function', () => {
       modulesSchema = [trackViewModule, trackViewModule, trackViewModule];
       await setAnalyticModulesMock(modulesSchema);
       analytics.Analytics.trackView(testStr, testObj, supportedModuleNames);
-      expect(mockedAnalyticModules[0].trackView).toHaveBeenCalledWith(testStr, testObj);
-      expect(mockedAnalyticModules[1].trackView).not.toHaveBeenCalledWith(testStr, testObj);
-      expect(mockedAnalyticModules[2].trackView).toHaveBeenCalledWith(testStr, testObj);
+      supportedModuleNames.forEach((moduleName, i) => {
+        expect(mockedAnalyticModules[i].trackView).toHaveBeenCalledWith(testStr, testObj);
+      });
+      expect(mockedAnalyticModules[2].trackView).not.toHaveBeenCalledWith(testStr, testObj);
     });
   });
   describe('initialize function', () => {
     test('run initialize in module without params', async () => {
       await setAnalyticModulesMock([initializeModule]);
-      jest.spyOn(mockedAnalyticModules[0], 'initialize');
       analytics.Analytics.initialize();
       expect(mockedAnalyticModules[0].initialize).toHaveBeenCalled();
     });
     test('run initialize in module with params', async () => {
       await setAnalyticModulesMock([initializeModule]);
-      jest.spyOn(mockedAnalyticModules[0], 'initialize');
       analytics.Analytics.initialize(testObj);
       expect(mockedAnalyticModules[0].initialize).toHaveBeenCalledWith(testObj);
     });
@@ -211,24 +209,20 @@ describe('analytics function', () => {
       expect(() => analytics.Analytics.initialize()).not.toThrow(Error);
     });
     test('run initialize in all modules without params', async () => {
-      await setAnalyticModulesMock([initializeModule, initializeModule, initializeModule]);
-      jest.spyOn(mockedAnalyticModules[0], 'initialize');
-      jest.spyOn(mockedAnalyticModules[1], 'initialize');
-      jest.spyOn(mockedAnalyticModules[2], 'initialize');
+      modulesSchema = [initializeModule, initializeModule, initializeModule];
+      await setAnalyticModulesMock(modulesSchema);
       analytics.Analytics.initialize();
-      expect(mockedAnalyticModules[0].initialize).toHaveBeenCalled();
-      expect(mockedAnalyticModules[1].initialize).toHaveBeenCalled();
-      expect(mockedAnalyticModules[2].initialize).toHaveBeenCalled();
+      modulesSchema.forEach((module, i) => {
+        expect(mockedAnalyticModules[i].initialize).toHaveBeenCalled();
+      });
     });
     test('run initialize in all modules with params', async () => {
-      await setAnalyticModulesMock([initializeModule, initializeModule, initializeModule]);
-      jest.spyOn(mockedAnalyticModules[0], 'initialize');
-      jest.spyOn(mockedAnalyticModules[1], 'initialize');
-      jest.spyOn(mockedAnalyticModules[2], 'initialize');
+      modulesSchema = [initializeModule, initializeModule, initializeModule];
+      await setAnalyticModulesMock(modulesSchema);
       analytics.Analytics.initialize(testObj);
-      expect(mockedAnalyticModules[0].initialize).toHaveBeenCalledWith(testObj);
-      expect(mockedAnalyticModules[1].initialize).toHaveBeenCalledWith(testObj);
-      expect(mockedAnalyticModules[2].initialize).toHaveBeenCalledWith(testObj);
+      modulesSchema.forEach((module, i) => {
+        expect(mockedAnalyticModules[i].initialize).toHaveBeenCalledWith(testObj);
+      });
     });
   });
   describe('trackConversion function', () => {
@@ -252,18 +246,20 @@ describe('analytics function', () => {
       expect(() => analytics.Analytics.trackConversion()).not.toThrow(Error);
     });
     test('run trackConversion in all modules without params', async () => {
-      await setAnalyticModulesMock([trackConversionModule, trackConversionModule, trackConversionModule]);
+      modulesSchema = [trackConversionModule, trackConversionModule, trackConversionModule];
+      await setAnalyticModulesMock(modulesSchema);
       analytics.Analytics.trackConversion();
-      expect(mockedAnalyticModules[0].trackConversion).toHaveBeenCalled();
-      expect(mockedAnalyticModules[1].trackConversion).toHaveBeenCalled();
-      expect(mockedAnalyticModules[2].trackConversion).toHaveBeenCalled();
+      modulesSchema.forEach((module, i) => {
+        expect(mockedAnalyticModules[i].trackConversion).toHaveBeenCalled();
+      });
     });
     test('run trackConversion in all modules with params', async () => {
-      await setAnalyticModulesMock([trackConversionModule, trackConversionModule, trackConversionModule]);
+      modulesSchema = [trackConversionModule, trackConversionModule, trackConversionModule];
+      await setAnalyticModulesMock(modulesSchema);
       analytics.Analytics.trackConversion(testStr);
-      expect(mockedAnalyticModules[0].trackConversion).toHaveBeenCalledWith(testStr);
-      expect(mockedAnalyticModules[1].trackConversion).toHaveBeenCalledWith(testStr);
-      expect(mockedAnalyticModules[2].trackConversion).toHaveBeenCalledWith(testStr);
+      modulesSchema.forEach((module, i) => {
+        expect(mockedAnalyticModules[i].trackConversion).toHaveBeenCalledWith(testStr);
+      });
     });
   });
   describe('setGlobalProperties function', () => {
@@ -273,15 +269,13 @@ describe('analytics function', () => {
       analyticModules = await import('../src/modules');
       analytics = await import('../src/index');
     });
-    test('setGlobalProperties - as string', () => {
-      // eslint-disable-next-line
-    const globalProperties = analytics.__get__('globalProperties');
+    test('setGlobalProperties - passed parameter as string', () => {
+      const globalProperties = analytics.__get__('globalProperties');
       analytics.Analytics.setGlobalProperties('test', 'test');
       expect(globalProperties).toEqual(testObj);
     });
-    test('setGlobalProperties - as object', () => {
-    // eslint-disable-next-line
-    const globalProperties = analytics.__get__('globalProperties');
+    test('setGlobalProperties - passed parameter as object', () => {
+      const globalProperties = analytics.__get__('globalProperties');
       analytics.Analytics.setGlobalProperties(testObj);
       expect(globalProperties).toEqual(testObj);
     });
