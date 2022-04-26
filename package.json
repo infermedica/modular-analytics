@@ -5,7 +5,7 @@
   "author": "Infermedica",
   "license": "MIT",
   "main": "src/index.js",
-  "imports": {
+  "exports": {
     ".": "src/index.js",
     "./vue": "src/vue.js"
   },
@@ -38,7 +38,12 @@
       "sourceType": "module"
     },
     "rules": {
-      "max-len": ["error", { "code": 120 }]
+      "max-len": [
+        "error",
+        {
+          "code": 120
+        }
+      ]
     }
   },
   "scripts": {
