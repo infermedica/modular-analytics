@@ -184,7 +184,7 @@ Analytics.initialize({ firebaseAuth, forceSignInAnonymously: false, firebaseAppN
 
 ### Usage with Vue.js 3.x
 
-This package cna be used ad Vue.js 3 plugin:
+This package can be used ad Vue.js 3 plugin:
 
 ```javascript
 import VueAnalytics from '@infermedica/modular-analytics/vue';
