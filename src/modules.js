@@ -192,15 +192,15 @@ if (__analytics.amplitude.isEnabled) {
 // --- Infermedica Analytics ---
 if (__analytics.infermedicaAnalytics.isEnabled) {
   const infermedicaModule = function () {
-    const useFirebase = __analytics.infermedicaAnalytics?.useFirebase;
-    const baseURL = __analytics.infermedicaAnalytics?.baseURL
-      || 'https://analytics-proxy.infermedica.com/';
     const {
+      appId,
       environment,
+      useFirebase,
+      baseURL = 'https://analytics-proxy.infermedica.com/',
+      publishURL = '/api/v1/publish',
     } = __analytics.infermedicaAnalytics;
-    const headers = {
-      'infer-application-id': __analytics.infermedicaAnalytics?.appId,
-    };
+
+    const headers = { 'infer-application-id': appId };
     let analyticsApi = null;
     let browser = null;
     let auth = null;
@@ -208,7 +208,6 @@ if (__analytics.infermedicaAnalytics.isEnabled) {
     let firebaseUser = null;
 
     const publish = async function (data) {
-      const publishURL = '/api/v1/publish';
       const attributes = {
         environment,
       };

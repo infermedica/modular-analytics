@@ -44,6 +44,8 @@ new webpack.DefinePlugin({
       sendUID: false, // allow to send firebase UID, false by default 
       allowProperties: JSON.stringify(['application', 'user', 'section', 'event_details']), // optional
       disallowProperties: JSON.stringify([]), // optional
+      baseURL: '<your-url-origin>', // optional, default value is 'https://analytics-proxy.infermedica.com/'
+      publishURL: '<your-url-path>', // optional, default value is '/api/v1/publish' 
     },
   }
 })
@@ -184,7 +186,7 @@ Analytics.initialize({ firebaseAuth, forceSignInAnonymously: false, firebaseAppN
 
 ### Usage with Vue.js 3.x
 
-This package can be used ad Vue.js 3 plugin:
+This package can be used as Vue.js 3 plugin:
 
 ```javascript
 import VueAnalytics from '@infermedica/modular-analytics/vue';
