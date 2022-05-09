@@ -6,8 +6,8 @@
   "license": "MIT",
   "main": "src/index.js",
   "exports": {
-    ".": "src/index.js",
-    "./vue": "src/vue.js"
+    ".": "./src/index.js",
+    "./vue": "./src/vue.js"
   },
   "repository": {
     "type": "git",
