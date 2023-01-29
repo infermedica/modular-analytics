@@ -44,6 +44,7 @@ describe('module/amplitude', () => {
     const { trackEvent } = analyticModules.default[0];
     window.amplitude.getInstance().logEvent = jest.fn();
     trackEvent(testString, testProperties);
-    expect(window.amplitude.getInstance().logEvent).toHaveBeenCalledWith(testString, { test2: 'test2', test3: 'test3' });
+    expect(window.amplitude.getInstance().logEvent)
+      .toHaveBeenCalledWith(testString, { test2: 'test2', test3: 'test3' });
   });
 });

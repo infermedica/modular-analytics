@@ -41,6 +41,11 @@ describe('module/googleTagManager', () => {
     const { trackConversion } = analyticModules.default[0];
     window.gtag = jest.fn();
     trackConversion(testString);
-    expect(window.gtag).toHaveBeenCalledWith('event', 'conversion', { send_to: `${__analytics.googleAdWords.key}/${testString}` });
+    expect(window.gtag)
+      .toHaveBeenCalledWith(
+        'event',
+        'conversion',
+        { send_to: `${__analytics.googleAdWords.key}/${testString}` },
+      );
   });
 });

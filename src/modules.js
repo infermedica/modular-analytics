@@ -25,29 +25,26 @@ const filterProperties = (
 
 // --- Debug module ---
 /* eslint-disable no-console */
-if (__analytics.debug.isEnabled) {
-  const debugModule = function () {
-    console.log('Analytics (initialization)');
+function debugModule() {
+  console.log('Analytics (initialization)');
 
-    return {
-      name: names.DEBUG,
-      trackView(viewName) {
-        console.log('Analytics (trackView):', viewName);
-      },
-      trackEvent(eventName, properties) {
-        console.log('Analytics (trackEvent):', eventName, properties);
-      },
-    };
+  return {
+    name: names.DEBUG,
+    trackView(viewName) {
+      console.log('Analytics (trackView):', viewName);
+    },
+    trackEvent(eventName, properties) {
+      console.log('Analytics (trackEvent):', eventName, properties);
+    },
   };
-
-  analyticModules.push(debugModule());
 }
+
+if (__analytics.debug.isEnabled) analyticModules.push(debugModule());
 /* eslint-enable */
 
 // --- Google Tag Manager ---
-if (__analytics.googleTagManager.isEnabled) {
-  const googleAnalyticsModule = function () {
-    /* eslint-disable */
+function googleTagManager() {
+  /* eslint-disable */
     // @formatter:off
     (function(s,o,g,a,m){a=s.createElement(o),
     m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
@@ -55,51 +52,48 @@ if (__analytics.googleTagManager.isEnabled) {
     // @formatter:on
     /* eslint-enable */
 
-    window.dataLayer = window.dataLayer || [];
-    window.gtag = function () {
-      window.dataLayer.push(arguments);
-    };
-    window.gtag('js', new Date());
-
-    if (__analytics.googleAnalytics.isEnabled) {
-      window.gtag('config', __analytics.googleAnalytics.key, {
-        send_page_view: false,
-        anonymize_ip: true,
-      });
-    }
-
-    if (__analytics.googleAdWords.isEnabled) {
-      window.gtag('config', __analytics.googleAdWords.key,
-        { anonymize_ip: true });
-    }
-
-    return {
-      name: names.GOOGLE_TAG_MANAGE,
-      trackView() {
-        window.gtag('event', 'page_view');
-      },
-      trackEvent(eventName) {
-        window.gtag('event', eventName, {
-          event_category: 'Event',
-        });
-      },
-      trackConversion(conversionLabel) {
-        if (__analytics.googleAdWords.isEnabled) {
-          window.gtag('event', 'conversion', {
-            send_to: `${__analytics.googleAdWords.key}/${conversionLabel}`,
-          });
-        }
-      },
-    };
+  window.dataLayer = window.dataLayer || [];
+  window.gtag = (...args) => {
+    window.dataLayer.push(args);
   };
+  window.gtag('js', new Date());
 
-  analyticModules.push(googleAnalyticsModule());
+  if (__analytics.googleAnalytics.isEnabled) {
+    window.gtag('config', __analytics.googleAnalytics.key, {
+      send_page_view: false,
+      anonymize_ip: true,
+    });
+  }
+
+  if (__analytics.googleAdWords.isEnabled) {
+    window.gtag('config', __analytics.googleAdWords.key,
+      { anonymize_ip: true });
+  }
+
+  return {
+    name: names.GOOGLE_TAG_MANAGE,
+    trackView() {
+      window.gtag('event', 'page_view');
+    },
+    trackEvent(eventName) {
+      window.gtag('event', eventName, {
+        event_category: 'Event',
+      });
+    },
+    trackConversion(conversionLabel) {
+      if (__analytics.googleAdWords.isEnabled) {
+        window.gtag('event', 'conversion', {
+          send_to: `${__analytics.googleAdWords.key}/${conversionLabel}`,
+        });
+      }
+    },
+  };
 }
+if (__analytics.googleTagManager.isEnabled) analyticModules.push(googleTagManager());
 
 // --- Google Analytics ---
-else if (__analytics.googleAnalytics.isEnabled) {
-  const googleAnalyticsModule = function () {
-    /* eslint-disable */
+function googleAnalyticsModule() {
+  /* eslint-disable */
     // @formatter:off
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -108,31 +102,30 @@ else if (__analytics.googleAnalytics.isEnabled) {
     // @formatter:on
     /* eslint-enable */
 
-    window.ga('create', __analytics.googleAnalytics.key,
-      window.location.hostname);
-    window.ga('set', 'anonymizeIp', true);
+  window.ga('create', __analytics.googleAnalytics.key,
+    window.location.hostname);
+  window.ga('set', 'anonymizeIp', true);
 
-    return {
-      name: names.GOOGLE_ANALYTICS,
-      trackView(viewName) {
-        window.ga('send', 'pageview', viewName || window.location.pathname);
-      },
-      trackEvent(eventName) {
-        window.ga('send', 'event', {
-          eventCategory: 'Event',
-          eventAction: eventName,
-        });
-      },
-    };
+  return {
+    name: names.GOOGLE_ANALYTICS,
+    trackView(viewName) {
+      window.ga('send', 'pageview', viewName || window.location.pathname);
+    },
+    trackEvent(eventName) {
+      window.ga('send', 'event', {
+        eventCategory: 'Event',
+        eventAction: eventName,
+      });
+    },
   };
-
+}
+if (!__analytics.googleTagManager.isEnabled && __analytics.googleAnalytics.isEnabled) {
   analyticModules.push(googleAnalyticsModule());
 }
 
 // --- Amplitude ---
-if (__analytics.amplitude.isEnabled) {
-  const amplitudeModule = function () {
-    /* eslint-disable */
+function amplitudeModule() {
+  /* eslint-disable */
     // @formatter:off
     (function(e,t){var n=e.amplitude||{_q:[],_iq:{}};var r=t.createElement("script");r.type="text/javascript"
     ;r.integrity="sha384-d/yhnowERvm+7eCU79T/bYjOiMmq4F11ElWYLmt0ktvYEVgqLDazh4+gW9CKMpYW";r.crossOrigin="anonymous"
@@ -153,204 +146,199 @@ if (__analytics.amplitude.isEnabled) {
     // @formatter:on
     /* eslint-enable */
 
-    window.amplitude.getInstance().init(__analytics.amplitude.key, null, {
-      forceHttps: true,
-      domain: window.location.hostname,
-      trackingOptions: {
-        carrier: false,
-        dma: false,
-        ip_address: false,
-      },
-    });
+  window.amplitude.getInstance().init(__analytics.amplitude.key, null, {
+    forceHttps: true,
+    domain: window.location.hostname,
+    trackingOptions: {
+      carrier: false,
+      dma: false,
+      ip_address: false,
+    },
+  });
 
-    return {
-      name: names.AMPLITUDE,
-      trackView(viewName) {
-        window.amplitude.getInstance()
-          .logEvent('Page Viewed', { page: viewName });
-      },
-      trackEvent(eventName, properties) {
-        const allowProperties = __analytics.amplitude?.allowProperties;
-        const disallowProperties = __analytics.amplitude?.disallowProperties;
-        const filteredProperties = filterProperties(allowProperties,
-          disallowProperties, properties);
-        const payload = Object.keys(filteredProperties)
-          .reduce((object, key) => (
-            filteredProperties[key]
-              ? { ...object, [key]: filteredProperties[key] }
-              : object
-          ), {});
+  return {
+    name: names.AMPLITUDE,
+    trackView(viewName) {
+      window.amplitude.getInstance()
+        .logEvent('Page Viewed', { page: viewName });
+    },
+    trackEvent(eventName, properties) {
+      const allowProperties = __analytics.amplitude?.allowProperties;
+      const disallowProperties = __analytics.amplitude?.disallowProperties;
+      const filteredProperties = filterProperties(allowProperties,
+        disallowProperties, properties);
+      const payload = Object.keys(filteredProperties)
+        .reduce((object, key) => (
+          filteredProperties[key]
+            ? { ...object, [key]: filteredProperties[key] }
+            : object
+        ), {});
 
-        window.amplitude.getInstance().logEvent(eventName, payload);
-      },
-    };
+      window.amplitude.getInstance().logEvent(eventName, payload);
+    },
   };
-
-  analyticModules.push(amplitudeModule());
 }
+if (__analytics.amplitude.isEnabled) analyticModules.push(amplitudeModule());
 
 // --- Infermedica Analytics ---
-if (__analytics.infermedicaAnalytics.isEnabled) {
-  const infermedicaModule = function () {
-    const {
-      appId,
+function infermedicaModule() {
+  const {
+    appId,
+    environment,
+    useFirebase,
+    baseURL = 'https://analytics-proxy.infermedica.com/',
+    publishURL = '/api/v1/publish',
+  } = __analytics.infermedicaAnalytics;
+
+  const headers = { 'infer-application-id': appId };
+  let analyticsApi = null;
+  let browser = null;
+  let auth = null;
+  let eventQueue = [];
+  let firebaseUser = null;
+
+  const publish = async (data) => {
+    const attributes = {
       environment,
-      useFirebase,
-      baseURL = 'https://analytics-proxy.infermedica.com/',
-      publishURL = '/api/v1/publish',
-    } = __analytics.infermedicaAnalytics;
-
-    const headers = { 'infer-application-id': appId };
-    let analyticsApi = null;
-    let browser = null;
-    let auth = null;
-    let eventQueue = [];
-    let firebaseUser = null;
-
-    const publish = async function (data) {
-      const attributes = {
-        environment,
-      };
-      const { topic } = data;
-      const events = [
-        {
-          data,
-          attributes,
-        },
-      ];
-      const payload = {
-        topic: topic || __analytics.infermedicaAnalytics.topic,
-        events,
-      };
-      if (useFirebase) {
-        const token = await firebaseUser.getIdToken();
-        analyticsApi.defaults.headers.Authorization = `Bearer ${token}`;
-      }
-      await analyticsApi.post(publishURL, payload);
     };
-
-    const getUid = () => (useFirebase && __analytics.infermedicaAnalytics?.sendUID
-      ? firebaseUser?.uid
-      : null);
-
-    const initializeBrowser = async () => {
-      if (browser === null) {
-        const { default: Bowser } = await import('bowser');
-        browser = Bowser.getParser(window.navigator.userAgent);
-      }
-      return Promise.resolve(browser);
+    const { topic } = data;
+    const events = [
+      {
+        data,
+        attributes,
+      },
+    ];
+    const payload = {
+      topic: topic || __analytics.infermedicaAnalytics.topic,
+      events,
     };
+    if (useFirebase) {
+      const token = await firebaseUser.getIdToken();
+      analyticsApi.defaults.headers.Authorization = `Bearer ${token}`;
+    }
+    await analyticsApi.post(publishURL, payload);
+  };
 
-    const initializeAxios = async () => {
-      if (analyticsApi === null) {
-        const { default: axios } = await import('axios');
+  const getUid = () => (useFirebase && __analytics.infermedicaAnalytics?.sendUID
+    ? firebaseUser?.uid
+    : null);
 
-        analyticsApi = axios.create({
-          baseURL,
-          headers,
-        });
-      }
-    };
+  const initializeBrowser = async () => {
+    if (browser === null) {
+      const { default: Bowser } = await import('bowser');
+      browser = Bowser.getParser(window.navigator.userAgent);
+    }
+    return Promise.resolve(browser);
+  };
 
-    return {
-      name: names.INFERMEDICA_ANALYTICS,
-      /**
+  const initializeAxios = async () => {
+    if (analyticsApi === null) {
+      const { default: axios } = await import('axios');
+
+      analyticsApi = axios.create({
+        baseURL,
+        headers,
+      });
+    }
+  };
+
+  return {
+    name: names.INFERMEDICA_ANALYTICS,
+    /**
        * @param {import('./main').InitializeParams} options
        */
-      initialize: async (options = {}) => {
-        await Promise.all([initializeAxios(), initializeBrowser()]);
+    initialize: async (options = {}) => {
+      await Promise.all([initializeAxios(), initializeBrowser()]);
 
-        // Use directly from __analytics to support tree shaking
-        if (__analytics.infermedicaAnalytics.useFirebase) {
-          const initializeFirebase = async () => {
-            const {
-              forceSignInAnonymously,
-              firebaseAuth,
-              firebaseConfig,
-              firebaseAppName,
-            } = options;
+      // Use directly from __analytics to support tree shaking
+      if (__analytics.infermedicaAnalytics.useFirebase) {
+        const initializeFirebase = async () => {
+          const {
+            forceSignInAnonymously,
+            firebaseAuth,
+            firebaseConfig,
+            firebaseAppName,
+          } = options;
 
-            const { onAuthStateChanged } = await import('firebase/auth');
-            if (firebaseAuth && !forceSignInAnonymously) {
-              auth = firebaseAuth;
-            } else if (firebaseConfig && forceSignInAnonymously) {
-              const [{ signInAnonymously, getAuth }, { initializeApp }] = await Promise.all([
-                import('firebase/auth'),
-                import('firebase/app'),
-              ]);
-              const firebaseApp = initializeApp(firebaseConfig, firebaseAppName);
-              auth = getAuth(firebaseApp);
-              await signInAnonymously(auth);
-            }
+          const { onAuthStateChanged } = await import('firebase/auth');
+          if (firebaseAuth && !forceSignInAnonymously) {
+            auth = firebaseAuth;
+          } else if (firebaseConfig && forceSignInAnonymously) {
+            const [{ signInAnonymously, getAuth }, { initializeApp }] = await Promise.all([
+              import('firebase/auth'),
+              import('firebase/app'),
+            ]);
+            const firebaseApp = initializeApp(firebaseConfig, firebaseAppName);
+            auth = getAuth(firebaseApp);
+            await signInAnonymously(auth);
+          }
 
-            onAuthStateChanged(auth, async (authUser) => {
-              if (!authUser) return;
-              firebaseUser = authUser;
-              eventQueue.forEach((event) => {
-                const { user } = event;
-                publish({
-                  ...event,
-                  user: {
-                    ...user,
-                    id: getUid(),
-                  },
-                });
+          onAuthStateChanged(auth, async (authUser) => {
+            if (!authUser) return;
+            firebaseUser = authUser;
+            eventQueue.forEach((event) => {
+              const { user } = event;
+              publish({
+                ...event,
+                user: {
+                  ...user,
+                  id: getUid(),
+                },
               });
-              eventQueue = [];
             });
-          };
-          initializeFirebase();
-        }
-      },
-      /**
+            eventQueue = [];
+          });
+        };
+        initializeFirebase();
+      }
+    },
+    /**
        * @param { string } eventName
        * @param { object } properties
        */
-      async trackEvent(eventName, properties) {
-        // prevent to send event without event_details
-        if (!properties.event_details) {
-          return;
-        }
-        await Promise.all([initializeAxios(), initializeBrowser()]);
-        const allowProperties = __analytics.infermedicaAnalytics?.allowProperties;
-        const disallowProperties = __analytics.infermedicaAnalytics?.disallowProperties;
-        const filteredProperties = filterProperties(allowProperties,
-          disallowProperties, properties);
-        const date = new Date();
-        const { user, application } = filteredProperties;
-        const data = {
-          ...filteredProperties,
-          date,
-          application: {
-            ...application,
+    async trackEvent(eventName, properties) {
+      // prevent to send event without event_details
+      if (!properties.event_details) {
+        return;
+      }
+      await Promise.all([initializeAxios(), initializeBrowser()]);
+      const allowProperties = __analytics.infermedicaAnalytics?.allowProperties;
+      const disallowProperties = __analytics.infermedicaAnalytics?.disallowProperties;
+      const filteredProperties = filterProperties(allowProperties,
+        disallowProperties, properties);
+      const date = new Date();
+      const { user, application } = filteredProperties;
+      const data = {
+        ...filteredProperties,
+        date,
+        application: {
+          ...application,
+        },
+        user: {
+          ...user,
+          id: getUid(),
+          browser: browser.getBrowser(),
+          os: browser.getOS(),
+          platform: browser.getPlatform(),
+        },
+        event_details: {
+          event_type: '',
+          event_object: '',
+          event_data: {
+            type: '',
+            data: [],
           },
-          user: {
-            ...user,
-            id: getUid(),
-            browser: browser.getBrowser(),
-            os: browser.getOS(),
-            platform: browser.getPlatform(),
-          },
-          event_details: {
-            event_type: '',
-            event_object: '',
-            event_data: {
-              type: '',
-              data: [],
-            },
-            ...filteredProperties.event_details,
-          },
-        };
-        if (useFirebase && !firebaseUser) {
-          eventQueue.push(data);
-          return;
-        }
-        await publish(data);
-      },
-    };
+          ...filteredProperties.event_details,
+        },
+      };
+      if (useFirebase && !firebaseUser) {
+        eventQueue.push(data);
+        return;
+      }
+      await publish(data);
+    },
   };
-
-  analyticModules.push(infermedicaModule());
 }
+if (__analytics.infermedicaAnalytics.isEnabled) analyticModules.push(infermedicaModule());
 
 export default analyticModules;
