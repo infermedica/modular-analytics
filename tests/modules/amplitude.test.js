@@ -11,8 +11,8 @@ beforeEach(() => {
 describe('module/amplitude', () => {
   test('return [] when amplitude is disabled', async () => {
     __analytics.amplitude.isEnabled = false;
-    analyticModules = await import('../../src/modules');
-    expect(analyticModules).toEqual({ default: [] });
+    ({ default: analyticModules } = await import('../../src/modules'));
+    expect(analyticModules).toEqual([]);
   });
   test('return correct track view', async () => {
     analyticModules = await import('../../src/modules');

@@ -7,8 +7,8 @@ beforeEach(() => {
 
 describe('module/dubug', () => {
   test('return [] when debug is disabled', async () => {
-    analyticModules = await import('../../src/modules');
-    expect(analyticModules).toEqual({ default: [] });
+    ({ default: analyticModules } = await import('../../src/modules'));
+    expect(analyticModules).toEqual([]);
   });
   test('return correct track view', async () => {
     __analytics.debug.isEnabled = true;

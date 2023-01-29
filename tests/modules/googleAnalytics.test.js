@@ -11,8 +11,8 @@ beforeEach(() => {
 describe('module/googleAnalytics', () => {
   test('return [] when googleAnalytics is disabled', async () => {
     __analytics.googleAnalytics.isEnabled = false;
-    analyticModules = await import('../../src/modules');
-    expect(analyticModules).toEqual({ default: [] });
+    ({ default: analyticModules } = await import('../../src/modules'));
+    expect(analyticModules).toEqual([]);
   });
   test('return correct track view with parametr', async () => {
     analyticModules = await import('../../src/modules');

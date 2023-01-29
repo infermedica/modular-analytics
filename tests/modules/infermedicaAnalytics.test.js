@@ -1,8 +1,8 @@
+import axios from 'axios';
 /* global __analytics */
 jest.useFakeTimers('modern');
 jest.setSystemTime(new Date(2020, 3, 1));
 let analyticModules;
-let publishPayload;
 const testProperties = { test: 'test', test2: 'test2', test3: 'test3' };
 const expectedPayload = {
   events: [{
@@ -31,8 +31,11 @@ const expectedPayload = {
 jest.mock('bowser', () => ({
   getParser: () => ({ getBrowser: () => 'browser', getOS: () => 'os', getPlatform: () => 'platform' }),
 }));
-jest.mock('axios', () => ({
-  create: () => ({ post: (_, payload) => { publishPayload = payload; } }),
+
+jest.mock('axios');
+const mockPost = jest.fn((_, request) => request);
+jest.doMock('axios', () => ({
+  create: () => ({ post: mockPost }),
 }));
 
 beforeEach(() => {
@@ -51,8 +54,8 @@ beforeEach(() => {
 describe('module/infermedicaAnalytics', () => {
   test('return [] when infermedicaAnalytics is disabled', async () => {
     __analytics.infermedicaAnalytics.isEnabled = false;
-    analyticModules = await import('../../src/modules');
-    expect(analyticModules).toEqual({ default: [] });
+    ({ default: analyticModules } = await import('../../src/modules'));
+    expect(analyticModules).toEqual([]);
   });
   test('track event, correct publish payload', async () => {
     expectedPayload.events[0].data = {
@@ -62,7 +65,7 @@ describe('module/infermedicaAnalytics', () => {
     analyticModules = await import('../../src/modules');
     const { trackEvent } = analyticModules.default[0];
     await trackEvent('eventName', { event_details: {}, ...testProperties });
-    expect(publishPayload).toEqual(expectedPayload);
+    expect(mockPost).toHaveReturnedWith(expectedPayload);
   });
   test('track event, correct publish payload with dissalow properties', async () => {
     __analytics.infermedicaAnalytics.disallowProperties = ['test', 'test3'];
@@ -73,7 +76,7 @@ describe('module/infermedicaAnalytics', () => {
     analyticModules = await import('../../src/modules');
     const { trackEvent } = analyticModules.default[0];
     await trackEvent('eventName', { event_details: {}, ...testProperties });
-    expect(publishPayload).toEqual(expectedPayload);
+    expect(mockPost).toHaveReturnedWith(expectedPayload);
   });
   test('track event, correct publish payload with allow properties', async () => {
     __analytics.infermedicaAnalytics.allowProperties = ['test', 'test2'];
@@ -86,7 +89,7 @@ describe('module/infermedicaAnalytics', () => {
     analyticModules = await import('../../src/modules');
     const { trackEvent } = analyticModules.default[0];
     await trackEvent('eventName', { event_details: {}, ...testProperties });
-    expect(publishPayload).toEqual(expectedPayload);
+    expect(mockPost).toHaveReturnedWith(expectedPayload);
   });
   test('track event, with custom environment', async () => {
     __analytics.infermedicaAnalytics.environment = 'custom environment';
@@ -98,7 +101,7 @@ describe('module/infermedicaAnalytics', () => {
     analyticModules = await import('../../src/modules');
     const { trackEvent } = analyticModules.default[0];
     await trackEvent('eventName', { event_details: {}, ...testProperties });
-    expect(publishPayload).toEqual(expectedPayload);
+    expect(mockPost).toHaveReturnedWith(expectedPayload);
   });
   test('track event, with custom topic', async () => {
     __analytics.infermedicaAnalytics.topic = 'custom topic';
@@ -110,7 +113,7 @@ describe('module/infermedicaAnalytics', () => {
     analyticModules = await import('../../src/modules');
     const { trackEvent } = analyticModules.default[0];
     await trackEvent('eventName', { event_details: {}, ...testProperties });
-    expect(publishPayload).toEqual(expectedPayload);
+    expect(mockPost).toHaveReturnedWith(expectedPayload);
   });
   // TODO tests for initialize func
 });
