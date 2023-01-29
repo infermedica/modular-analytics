@@ -11,9 +11,7 @@ const names = {
   INFERMEDICA_ANALYTICS: 'infermedicaAnalytics',
 };
 const analyticModules = [];
-const filterProperties = (
-  allowProperties = [], disallowProperties = [], properties,
-) => Object.keys(
+const filterProperties = (properties, allowProperties = [], disallowProperties = []) => Object.keys(
   properties,
 )
   .filter(
@@ -66,8 +64,11 @@ function googleTagManager() {
   }
 
   if (__analytics.googleAdWords.isEnabled) {
-    window.gtag('config', __analytics.googleAdWords.key,
-      { anonymize_ip: true });
+    window.gtag(
+      'config',
+      __analytics.googleAdWords.key,
+      { anonymize_ip: true },
+    );
   }
 
   return {
@@ -102,8 +103,11 @@ function googleAnalyticsModule() {
     // @formatter:on
     /* eslint-enable */
 
-  window.ga('create', __analytics.googleAnalytics.key,
-    window.location.hostname);
+  window.ga(
+    'create',
+    __analytics.googleAnalytics.key,
+    window.location.hostname,
+  );
   window.ga('set', 'anonymizeIp', true);
 
   return {
@@ -165,8 +169,11 @@ function amplitudeModule() {
     trackEvent(eventName, properties) {
       const allowProperties = __analytics.amplitude?.allowProperties;
       const disallowProperties = __analytics.amplitude?.disallowProperties;
-      const filteredProperties = filterProperties(allowProperties,
-        disallowProperties, properties);
+      const filteredProperties = filterProperties(
+        properties,
+        allowProperties,
+        disallowProperties,
+      );
       const payload = Object.keys(filteredProperties)
         .reduce((object, key) => (
           filteredProperties[key]
@@ -304,8 +311,11 @@ function infermedicaModule() {
       await Promise.all([initializeAxios(), initializeBrowser()]);
       const allowProperties = __analytics.infermedicaAnalytics?.allowProperties;
       const disallowProperties = __analytics.infermedicaAnalytics?.disallowProperties;
-      const filteredProperties = filterProperties(allowProperties,
-        disallowProperties, properties);
+      const filteredProperties = filterProperties(
+        properties,
+        allowProperties,
+        disallowProperties,
+      );
       const date = new Date();
       const { user, application } = filteredProperties;
       const data = {

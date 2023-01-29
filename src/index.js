@@ -25,9 +25,7 @@ export const Analytics = {
     analyticModules.forEach((analyticModule) => {
       if ((modules && !modules.includes(analyticModule.name))
         || !('trackView' in analyticModule)) return;
-      analyticModule.trackView(
-        viewName, { ...globalProperties, ...properties },
-      );
+      analyticModule.trackView(viewName, { ...globalProperties, ...properties });
     });
   },
 
@@ -40,9 +38,7 @@ export const Analytics = {
     analyticModules.forEach((analyticModule) => {
       if ((modules && !modules.includes(analyticModule.name))
         || !('trackEvent' in analyticModule)) return;
-      analyticModule.trackEvent(
-        eventName, { ...globalProperties, ...properties },
-      );
+      analyticModule.trackEvent(eventName, { ...globalProperties, ...properties });
     });
   },
 

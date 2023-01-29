@@ -1,4 +1,3 @@
-import axios from 'axios';
 /* global __analytics */
 jest.useFakeTimers('modern');
 jest.setSystemTime(new Date(2020, 3, 1));
