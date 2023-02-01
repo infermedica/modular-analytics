@@ -31,7 +31,6 @@ jest.mock('bowser', () => ({
   getParser: () => ({ getBrowser: () => 'browser', getOS: () => 'os', getPlatform: () => 'platform' }),
 }));
 
-jest.mock('axios');
 const mockPost = jest.fn((_, request) => request);
 jest.doMock('axios', () => ({
   create: () => ({ post: mockPost }),
