@@ -331,7 +331,7 @@ function infermedicaModule() {
           os: browser.os,
           platform: {
             ...browser.device,
-            // Providing default type as ua-parser-js adds device.type only for non-desktop devices
+            // Providing 'desktop' as default type value as ua-parser-js adds device.type only when explicitly defined in UA, e.g. 'Mobile Safari'
             // More context - https://github.com/faisalman/ua-parser-js/issues/182#issuecomment-263115448
             type: browser.device?.type ?? 'desktop',
           },
