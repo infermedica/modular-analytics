@@ -232,8 +232,8 @@ function infermedicaModule() {
 
   const initializeBrowser = async () => {
     if (browser === null) {
-      const { default: Bowser } = await import('bowser');
-      browser = Bowser.getParser(window.navigator.userAgent);
+      const { default: UAParser } = await import('ua-parser-js');
+      browser = UAParser();
     }
     return Promise.resolve(browser);
   };
@@ -327,9 +327,14 @@ function infermedicaModule() {
         user: {
           ...user,
           id: getUid(),
-          browser: browser.getBrowser(),
-          os: browser.getOS(),
-          platform: browser.getPlatform(),
+          browser: browser.browser,
+          os: browser.os,
+          platform: {
+            ...browser.device,
+            // Providing default type as ua-parser-js adds device.type only for non-desktop devices
+            // More context - https://github.com/faisalman/ua-parser-js/issues/182#issuecomment-263115448
+            type: browser.device?.type ?? 'desktop',
+          },
         },
         event_details: {
           event_type: '',
