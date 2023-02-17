@@ -318,6 +318,31 @@ function infermedicaModule() {
       );
       const date = new Date();
       const { user, application } = filteredProperties;
+
+      const userDeviceFallback = {
+        browser: {
+          name: '',
+          version: '',
+        },
+        os: {
+          name: '',
+        },
+        platform: {
+          type: '',
+        },
+      };
+      const userDeviceValues = {
+        browser: browser.browser,
+        os: browser.os,
+        platform: {
+          ...browser.device,
+          // Providing 'desktop' as default type value as ua-parser-js adds device.type only when explicitly defined in UA, e.g. 'Mobile Safari'
+          // More context - https://github.com/faisalman/ua-parser-js/issues/182#issuecomment-263115448
+          type: browser.device?.type ?? 'desktop',
+        },
+        user_agent: browser.ua,
+      };
+
       const data = {
         ...filteredProperties,
         date,
@@ -327,14 +352,7 @@ function infermedicaModule() {
         user: {
           ...user,
           id: getUid(),
-          browser: browser.browser,
-          os: browser.os,
-          platform: {
-            ...browser.device,
-            // Providing 'desktop' as default type value as ua-parser-js adds device.type only when explicitly defined in UA, e.g. 'Mobile Safari'
-            // More context - https://github.com/faisalman/ua-parser-js/issues/182#issuecomment-263115448
-            type: browser.device?.type ?? 'desktop',
-          },
+          ...{ ...userDeviceFallback, ...userDeviceValues },
         },
         event_details: {
           event_type: '',
