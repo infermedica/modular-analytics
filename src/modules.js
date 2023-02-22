@@ -319,21 +319,16 @@ function infermedicaModule() {
       const date = new Date();
       const { user, application } = filteredProperties;
 
-      const userDeviceFallback = {
+      const userDeviceValuesWithFallback = {
         browser: {
           name: '',
           version: '',
+          ...browser.browser,
         },
         os: {
           name: '',
+          ...browser.os,
         },
-        platform: {
-          type: '',
-        },
-      };
-      const userDeviceValues = {
-        browser: browser.browser,
-        os: browser.os,
         platform: {
           ...browser.device,
           // Providing 'desktop' as default type value as ua-parser-js adds device.type only when explicitly defined in UA, e.g. 'Mobile Safari'
@@ -352,7 +347,7 @@ function infermedicaModule() {
         user: {
           ...user,
           id: getUid(),
-          ...{ ...userDeviceFallback, ...userDeviceValues },
+          ...userDeviceValuesWithFallback,
         },
         event_details: {
           event_type: '',
