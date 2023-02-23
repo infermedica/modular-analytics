@@ -330,7 +330,7 @@ function infermedicaModule() {
           version: browser.version ?? '',
         },
         os: {
-          ...browser.os,
+          ...os,
           name: os.name ?? '',
         },
         platform: {

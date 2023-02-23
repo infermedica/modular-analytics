@@ -19,9 +19,10 @@ const expectedPayload = {
       },
       user: {
         id: null,
-        browser: 'browser',
-        os: 'os',
-        platform: { type: 'platform' },
+        browser: { name: '', version: '' },
+        os: { name: '' },
+        platform: { type: 'desktop' },
+        user_agent: 'user_agent',
       },
     },
   }],
@@ -29,9 +30,10 @@ const expectedPayload = {
 };
 jest.mock('ua-parser-js', () => (
   () => ({
-    browser: 'browser',
-    os: 'os',
-    device: { type: 'platform' },
+    browser: {},
+    os: {},
+    device: {},
+    ua: 'user_agent',
   })
 ));
 
