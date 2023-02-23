@@ -199,7 +199,7 @@ function infermedicaModule() {
 
   const headers = { 'infer-application-id': appId };
   let analyticsApi = null;
-  let browser = null;
+  let userAgentInfo = null;
   let auth = null;
   let eventQueue = [];
   let firebaseUser = null;
@@ -230,12 +230,12 @@ function infermedicaModule() {
     ? firebaseUser?.uid
     : null);
 
-  const initializeBrowser = async () => {
-    if (browser === null) {
+  const initializeUserAgentInfo = async () => {
+    if (userAgentInfo === null) {
       const { default: UAParser } = await import('ua-parser-js');
-      browser = UAParser();
+      userAgentInfo = UAParser();
     }
-    return Promise.resolve(browser);
+    return Promise.resolve(userAgentInfo);
   };
 
   const initializeAxios = async () => {
@@ -255,7 +255,7 @@ function infermedicaModule() {
        * @param {import('./main').InitializeParams} options
        */
     initialize: async (options = {}) => {
-      await Promise.all([initializeAxios(), initializeBrowser()]);
+      await Promise.all([initializeAxios(), initializeUserAgentInfo()]);
 
       // Use directly from __analytics to support tree shaking
       if (__analytics.infermedicaAnalytics.useFirebase) {
@@ -308,7 +308,7 @@ function infermedicaModule() {
       if (!properties.event_details) {
         return;
       }
-      await Promise.all([initializeAxios(), initializeBrowser()]);
+      await Promise.all([initializeAxios(), initializeUserAgentInfo()]);
       const allowProperties = __analytics.infermedicaAnalytics?.allowProperties;
       const disallowProperties = __analytics.infermedicaAnalytics?.disallowProperties;
       const filteredProperties = filterProperties(
@@ -319,23 +319,27 @@ function infermedicaModule() {
       const date = new Date();
       const { user, application } = filteredProperties;
 
-      const userDeviceValuesWithFallback = {
+      const {
+        browser, os, device: platform, ua: user_agent, // eslint-disable-line camelcase
+      } = userAgentInfo;
+
+      const userAgentInfoWithFallback = {
         browser: {
-          name: '',
-          version: '',
-          ...browser.browser,
+          ...browser,
+          name: browser.name ?? '',
+          version: browser.version ?? '',
         },
         os: {
-          name: '',
           ...browser.os,
+          name: os.name ?? '',
         },
         platform: {
-          ...browser.device,
+          ...platform,
           // Providing 'desktop' as default type value as ua-parser-js adds device.type only when explicitly defined in UA, e.g. 'Mobile Safari'
           // More context - https://github.com/faisalman/ua-parser-js/issues/182#issuecomment-263115448
-          type: browser.device?.type ?? 'desktop',
+          type: platform.type ?? 'desktop',
         },
-        user_agent: browser.ua,
+        user_agent, // eslint-disable-line camelcase
       };
 
       const data = {
@@ -347,7 +351,7 @@ function infermedicaModule() {
         user: {
           ...user,
           id: getUid(),
-          ...userDeviceValuesWithFallback,
+          ...userAgentInfoWithFallback,
         },
         event_details: {
           event_type: '',
