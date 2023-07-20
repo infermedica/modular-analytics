@@ -34,7 +34,7 @@ export const Analytics = {
    * @param {object} properties
    * @param {Array} modules
    */
-  async trackEvent(eventName, properties, modules) {
+  trackEvent(eventName, properties, modules) {
     const responses = [];
 
     analyticModules.forEach((analyticModule) => {
@@ -46,8 +46,7 @@ export const Analytics = {
       responses.push(response);
     });
 
-    const awaited = await Promise.all(responses);
-    return awaited;
+    return Promise.all(responses);
   },
 
   /**
