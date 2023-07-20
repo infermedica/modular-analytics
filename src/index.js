@@ -35,16 +35,13 @@ export const Analytics = {
    * @param {Array} modules
    */
   trackEvent(eventName, properties, modules) {
-    const responses = [];
-
-    analyticModules.forEach((analyticModule) => {
+    const responses = analyticModules.map((analyticModule) => {
       const moduleRegistered = modules && modules.includes(analyticModule.name);
       const hasTrackEvent = ('trackEvent' in analyticModule);
 
-      if (!moduleRegistered || !hasTrackEvent) return;
-      const response = analyticModule.trackEvent(eventName, { ...globalProperties, ...properties });
-      responses.push(response);
-    });
+      if (!moduleRegistered || !hasTrackEvent) return [];
+      return analyticModule.trackEvent(eventName, { ...globalProperties, ...properties });
+    }).flat();
 
     return Promise.all(responses);
   },
