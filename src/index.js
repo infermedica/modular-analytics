@@ -35,11 +35,19 @@ export const Analytics = {
    * @param {Array} modules
    */
   async trackEvent(eventName, properties, modules) {
+    const responses = [];
+
     analyticModules.forEach((analyticModule) => {
-      if ((modules && !modules.includes(analyticModule.name))
-        || !('trackEvent' in analyticModule)) return;
-      analyticModule.trackEvent(eventName, { ...globalProperties, ...properties });
+      const moduleRegistered = modules && modules.includes(analyticModule.name);
+      const hasTrackEvent = ('trackEvent' in analyticModule);
+
+      if (!moduleRegistered || !hasTrackEvent) return;
+      const response = analyticModule.trackEvent(eventName, { ...globalProperties, ...properties });
+      responses.push(response);
     });
+
+    const awaited = await Promise.all(responses);
+    return awaited;
   },
 
   /**
@@ -62,4 +70,5 @@ export const Analytics = {
     }
   },
 };
+
 export default Analytics;

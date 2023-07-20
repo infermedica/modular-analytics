@@ -223,7 +223,7 @@ function infermedicaModule() {
       const token = await firebaseUser.getIdToken();
       analyticsApi.defaults.headers.Authorization = `Bearer ${token}`;
     }
-    await analyticsApi.post(publishURL, payload);
+    return analyticsApi.post(publishURL, payload);
   };
 
   const getUid = () => (useFirebase && __analytics.infermedicaAnalytics?.sendUID
@@ -367,7 +367,8 @@ function infermedicaModule() {
         eventQueue.push(data);
         return;
       }
-      await publish(data);
+      // eslint-disable-next-line consistent-return
+      return publish(data);
     },
   };
 }
