@@ -208,10 +208,10 @@ function infermedicaModule() {
     const attributes = {
       environment,
     };
-    const { topic } = data;
+    const { topic, ...rest } = data;
     const events = [
       {
-        data,
+        data: rest,
         attributes,
       },
     ];
