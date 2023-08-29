@@ -36,10 +36,13 @@ export const Analytics = {
    */
   trackEvent(eventName, properties, modules) {
     const responses = analyticModules.map((analyticModule) => {
-      const moduleRegistered = modules && modules.includes(analyticModule.name);
-      const hasTrackEvent = ('trackEvent' in analyticModule);
+      if (analyticModule.name !== 'debug') {
+        const moduleRegistered = modules && modules.includes(analyticModule.name);
+        const hasTrackEvent = ('trackEvent' in analyticModule);
 
-      if (!moduleRegistered || !hasTrackEvent) return [];
+        if (!moduleRegistered || !hasTrackEvent) return [];  
+      }
+      
       return analyticModule.trackEvent(eventName, { ...globalProperties, ...properties });
     }).flat();
 

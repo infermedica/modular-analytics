@@ -33,6 +33,7 @@ function debugModule() {
     },
     trackEvent(eventName, properties) {
       console.log('Analytics (trackEvent):', eventName, properties);
+      return new Promise((resolve) => resolve(200))
     },
   };
 }
